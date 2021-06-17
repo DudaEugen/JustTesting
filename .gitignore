@@ -135,3 +135,4 @@ db_import/
 /.db_backups/
 /templates/
 /media/
+.vscode/
