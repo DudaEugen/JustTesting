@@ -1,8 +1,7 @@
 from django import forms
 from typing import List, Optional
-
-from django.forms import fields
 from .models import *
+from JustTesting.utils.formsets import ModelAndInlineFormsetContainer
 
 
 class MultiplyChoiceTestAnswerInlineFormset(forms.models.BaseInlineFormSet):
@@ -28,32 +27,10 @@ class MultiplyChoiceTestForm(forms.ModelForm):
         fields = ("task_list", "text")
 
 
-class MultiplyChoiceTestWithAnswersForm:
-    def __init__(self, **kwargs):
-        self.test_form = MultiplyChoiceTestForm(**kwargs)
-        answers_formset_factory = forms.inlineformset_factory(
-            MultiplyChoiceTest,
-            MultiplyChoiceTestAnswer,
-            formset=MultiplyChoiceTestAnswerInlineFormset,
-            fields=("text", "weight"),
-            extra=2,
-        )
-        self.answer_formset = answers_formset_factory(
-            queryset=MultiplyChoiceTestAnswer.objects.none(), **kwargs
-        )
-
-    def is_valid(self):
-        return self.test_form.is_valid() and self.answer_formset.is_valid()
-
-    def save(self, commit: bool = True):
-        test_cd = self.test_form.cleaned_data
-        new_test = MultiplyChoiceTest(
-            task_list=test_cd.get("task_list"), text=test_cd.get("text")
-        )
-        new_test.save()
-        for form in self.answer_formset:
-            cd = form.cleaned_data
-            answer = MultiplyChoiceTestAnswer(
-                test=new_test, text=cd.get("text"), weight=cd.get("weight")
-            )
-            answer.save()
+class MultiplyChoiceTestWithAnswersForm(ModelAndInlineFormsetContainer):
+    model = MultiplyChoiceTest
+    model_fields = ("task_list", "text")
+    formset_model = MultiplyChoiceTestAnswer
+    formset_model_fields = ("text", "weight")
+    formset = MultiplyChoiceTestAnswerInlineFormset
+    formset_model_foreignkey_name = "test"
