@@ -1,9 +1,11 @@
 from django.contrib import admin
 from .models import *
+from .forms import MultiplyChoiceTestAnswerInlineFormset
 
 
-class AnswerForMultiplyCMultiplyChoiceTestAnswerInline(admin.TabularInline):
+class MultiplyChoiceTestAnswerInline(admin.TabularInline):
     model = MultiplyChoiceTestAnswer
+    formset = MultiplyChoiceTestAnswerInlineFormset
     extra = 0
     verbose_name = "Варіант відповіді"
     verbose_name_plural = "Варіанти відповіді"
@@ -28,7 +30,7 @@ class MultiplyChoiceTestAdmin(admin.ModelAdmin):
         "text",
     )
     inlines = (
-        AnswerForMultiplyCMultiplyChoiceTestAnswerInline,
+        MultiplyChoiceTestAnswerInline,
     )
 
 
