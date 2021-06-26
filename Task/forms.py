@@ -21,12 +21,6 @@ class MultiplyChoiceTestAnswerInlineFormset(forms.models.BaseInlineFormSet):
             raise forms.ValidationError(errors)
 
 
-class MultiplyChoiceTestForm(forms.ModelForm):
-    class Meta:
-        model = MultiplyChoiceTest
-        fields = ("task_list", "text")
-
-
 class MultiplyChoiceTestWithAnswersForm(ModelAndInlineFormsetContainer):
     model = MultiplyChoiceTest
     model_fields = ("task_list", "text")
