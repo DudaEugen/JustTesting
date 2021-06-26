@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <title>Створити тест з вибором кількох відповідей</title>
+    </head>
+    <body>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.test_form }}
+            {{ form.answer_formset }}
+            {% for d in form.answer_formset.errors %}
+                {% for error in d.values %}
+                    {{ error }}
+                {% endfor %}
+            {% endfor %}
+            <input type="submit" value="Створити тест">
+        </form>
+    </body>
+</html>
