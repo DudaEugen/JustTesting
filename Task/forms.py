@@ -9,14 +9,16 @@ class MultiplyChoiceTestAnswerInlineFormset(forms.models.BaseInlineFormSet):
         answers: List[MultiplyChoiceTestAnswer] = []
         for form in self.forms:
             if form.cleaned_data and not form.cleaned_data["DELETE"]:
-                answers.append(MultiplyChoiceTestAnswer(
-                    text=form.cleaned_data["text"],
-                    weight=form.cleaned_data["weight"]
-                ))
+                answer_text = form.cleaned_data.get("text")
+                answer_weight = form.cleaned_data.get("weight")
+                if answer_text is not None and answer_weight is not None:
+                    answers.append(MultiplyChoiceTestAnswer(
+                        text=answer_text,
+                        weight=answer_weight
+                    ))
         errors: Optional[str] = MultiplyChoiceTest.find_errors_in_answer_list(
             answers
         )
-        print(errors)
         if errors is not None:
             raise forms.ValidationError(errors)
 

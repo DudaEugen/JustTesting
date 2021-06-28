@@ -1,3 +1,4 @@
+from typing import Optional
 from django import forms
 
 
@@ -33,8 +34,15 @@ class ModelAndInlineFormsetContainer:
         new_instance = self.model(**(self.form.cleaned_data))
         new_instance.save()
         for form in self.formset:
-            d = {field: form.cleaned_data[field]
-                 for field in self.formset_model_fields}
-            d[self.formset_model_foreignkey_name] = new_instance
-            new_object = self.formset_model(**d)
-            new_object.save()
+            d: Optional[dict] = {}
+            for field in self.formset_model_fields:
+                value = form.cleaned_data.get(field)
+                if value is not None:
+                    d[field] = value
+                else:
+                    d = None
+                    break
+            if d is not None:
+                d[self.formset_model_foreignkey_name] = new_instance
+                new_object = self.formset_model(**d)
+                new_object.save()
