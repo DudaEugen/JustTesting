@@ -1,13 +1,22 @@
 <html>
     <head>
+        {% load static %}
+        <script src="{% static 'Task/js/inline_formset.js' %}"></script>
         <title>Створити тест з вибором кількох відповідей</title>
     </head>
     <body>
         <form method="post">
             {% csrf_token %}
-            {{ form.form }}
-            {{ form.formset }}
+            {{ form.form.as_table }}
+            {{ form.formset.management_form }}
+            <div id="formset">
+                {% for answer_form in form.formset %}
+                    <div class="answer_form"> {{ answer_form.as_table }} </div>
+                {% endfor %}
+            </div>
+            <button onclick="add_inline_form();">+</button>
             <input type="submit" value="Створити тест">
         </form>
+        <script>set_inline_form_template("answer_form", "answer_set-");</script>
     </body>
 </html>
