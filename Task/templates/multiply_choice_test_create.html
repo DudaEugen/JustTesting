@@ -1,22 +1,29 @@
-<html>
-    <head>
-        {% load static %}
-        <script src="{% static 'JustTesting/js/inline_formset.js' %}"></script>
-        <title>Створити тест з вибором кількох відповідей</title>
-    </head>
-    <body>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.form.as_table }}
-            {{ form.formset.management_form }}
-            <div id="formset">
-                {% for answer_form in form.formset %}
-                    <div class="answer_form"> {{ answer_form.as_table }} </div>
-                {% endfor %}
-            </div>
-            <button onclick="add_inline_form();">+</button>
-            <input type="submit" value="Створити тест">
-        </form>
-        <script>set_inline_form_template("answer_form", "answer_set-");</script>
-    </body>
-</html>
+{% extends "base.html" %}
+
+{% block static_load %}
+    {% load static %}
+    <script src="{% static 'JustTesting/js/inline_formset.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+    Створити тест з вибором кількох відповідей
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.form.as_table }}
+        {{ form.formset.management_form }}
+        <div id="formset">
+            {% for answer_form in form.formset %}
+                <div class="answer_form"> {{ answer_form.as_table }} </div>
+            {% endfor %}
+        </div>
+        <button onclick="add_inline_form();">+</button>
+        <input type="submit" value="Створити тест">
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    <script>set_inline_form_template("answer_form", "answer_set-");</script>
+{% endblock %}

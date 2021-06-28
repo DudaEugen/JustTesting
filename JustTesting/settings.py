@@ -58,7 +58,7 @@ ROOT_URLCONF = 'JustTesting.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'JustTesting/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
