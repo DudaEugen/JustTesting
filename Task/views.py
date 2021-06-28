@@ -10,7 +10,3 @@ class MultiplyChoiceTestCreateView(CreateView):
 
     def get_success_url(self):
         return "create"
-
-    def post(self, request, *args, **kwargs):
-        print(request.POST)
-        return super().post(request, *args, **kwargs)
