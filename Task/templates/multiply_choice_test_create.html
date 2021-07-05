@@ -16,14 +16,14 @@
         {{ form.formset.management_form }}
         <div id="formset">
             {% for answer_form in form.formset %}
-                <div class="answer_form"> {{ answer_form.as_table }} </div>
+                <div class="answer_form" data-inline-prefix="answer_set-"> {{ answer_form.as_table }} </div>
             {% endfor %}
         </div>
-        <button onclick="add_inline_form();">+</button>
+        <button onclick="inline_formsets.get('answer_set-').add_inline_form();">+</button>
         <input type="submit" value="Створити тест">
     </form>
 {% endblock %}
 
 {% block scripts %}
-    <script>set_inline_form_template("answer_form", "answer_set-");</script>
+    <script>add_inline_formset();</script>
 {% endblock %}
