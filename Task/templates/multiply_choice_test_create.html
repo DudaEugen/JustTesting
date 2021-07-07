@@ -14,6 +14,7 @@
         {% csrf_token %}
         {{ form.form.as_table }}
         {{ form.formset.management_form }}
+        {{ form.formset.non_form_errors }}
         <div id="formset">
             {% for answer_form in form.formset %}
                 <div class="answer_form" data-inline-prefix="answer_set-"> {{ answer_form.as_table }} </div>
