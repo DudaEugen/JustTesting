@@ -1,8 +1,9 @@
 from typing import Optional
+from abc import ABC, abstractmethod
 from django import forms
 
 
-class ModelAndInlineFormsetContainer:
+class ModelAndInlineFormsetContainer(ABC):
     model = None
     model_fields = ()
     formset_model = None
@@ -11,38 +12,34 @@ class ModelAndInlineFormsetContainer:
     formset_model_foreignkey_name = ""
 
     def __init__(self, **kwargs):
-        form = forms.modelform_factory(
+        f = forms.modelform_factory(
             model=self.model, fields=self.model_fields
         )
-        self.form = form(**kwargs)
+        self.form = f(**kwargs)
 
+        instance_of_model = kwargs.get("instance")
         formset_factory = forms.inlineformset_factory(
             self.model,
             self.formset_model,
             formset=self.formset,
             fields=self.formset_model_fields,
-            extra=2,
+            extra=2 if instance_of_model is None else 1,
         )
+        q = self.formset_model.objects.none() if instance_of_model is None else\
+            self.__class__.get_queryset(instance_of_model)
         self.formset = formset_factory(
-            queryset=self.formset_model.objects.none(), **kwargs
+            queryset=q,
+            **kwargs
         )
+
+    @classmethod
+    @abstractmethod
+    def get_queryset(cls, instance):
+        pass
 
     def is_valid(self):
         return self.form.is_valid() and self.formset.is_valid()
 
     def save(self, commit: bool = True):
-        new_instance = self.model(**(self.form.cleaned_data))
-        new_instance.save()
-        for form in self.formset:
-            d: Optional[dict] = {}
-            for field in self.formset_model_fields:
-                value = form.cleaned_data.get(field)
-                if value is not None:
-                    d[field] = value
-                else:
-                    d = None
-                    break
-            if d is not None:
-                d[self.formset_model_foreignkey_name] = new_instance
-                new_object = self.formset_model(**d)
-                new_object.save()
+        self.formset.instance = self.form.save(commit)
+        self.formset.save(commit)

@@ -27,6 +27,10 @@ class MultiplyChoiceTestWithAnswersForm(ModelAndInlineFormsetContainer):
     model = MultiplyChoiceTest
     model_fields = ("task_list", "text")
     formset_model = MultiplyChoiceTestAnswer
-    formset_model_fields = ("text", "weight")
+    formset_model_fields = "__all__"
     formset = MultiplyChoiceTestAnswerInlineFormset
     formset_model_foreignkey_name = "test"
+
+    @classmethod
+    def get_queryset(cls, instance):
+        return instance.answer_set.all()
