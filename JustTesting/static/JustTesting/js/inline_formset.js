@@ -1,12 +1,15 @@
 const inline_form_attr = "data-inline-prefix";
+const inline_form_wrapper_attr = "data-inline-form";
 
 class InlineFormset {
-    constructor(template_element) {
-        let prefix = template_element.getAttribute(inline_form_attr);
+    constructor(formset_wrapper) {
+        let form_wrappers = formset_wrapper.querySelectorAll('[' + inline_form_wrapper_attr + ']');
+        let template_element = form_wrappers[form_wrappers.length - 1];
+        let prefix = template_element.getAttribute(inline_form_wrapper_attr);
         this.prefixes = [prefix, "id_" + prefix];
         this.container = template_element.parentNode;
         this.form = template_element.cloneNode(true);
-        this.max_index = this.container.querySelectorAll('[' + inline_form_attr + ']').length - 1;
+        this.max_index = this.container.querySelectorAll('[' + inline_form_wrapper_attr + ']').length - 1;
     }
 
     change_attributes(nodes) {
@@ -38,15 +41,14 @@ class InlineFormset {
         this.max_index += 1;
         this.change_attributes(new_form.childNodes);
         document.getElementById(this.prefixes[1] + "TOTAL_FORMS").setAttribute("value", this.max_index + 1);
-        console.log(this.max_index);
     }
 }
 
 var inline_formsets = new Map();
 
 function add_inline_formset() {
-    let forms = document.querySelectorAll('[' + inline_form_attr + ']');
-    for (let i = 0; i < forms.length; ++i) {
-        inline_formsets.set(forms[i].getAttribute(inline_form_attr), new InlineFormset(forms[i]));
+    let formsets = document.querySelectorAll('[' + inline_form_attr + ']');
+    for (let i = 0; i < formsets.length; ++i) {
+        inline_formsets.set(formsets[i].getAttribute(inline_form_attr), new InlineFormset(formsets[i]));
     }
 }
