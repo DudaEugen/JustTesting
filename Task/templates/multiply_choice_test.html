@@ -3,27 +3,101 @@
 {% block static_load %}
     {% load static %}
     <script src="{% static 'JustTesting/js/inline_formset.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
 {% endblock %}
 
 {% block content %}
-    <form method="post">
+    <div class="form-wrapper">
+        <form method="post">
         {% csrf_token %}
-        {{ form.form.as_table }}
-        {{ form.formset.management_form }}
-        {{ form.formset.non_form_errors }}
-        <div id="formset" data-inline-prefix="answer_set-">
-            {% for answer_form in form.formset %}
-                <div class="answer_form" data-inline-form="answer_set-"> 
-                    {{ answer_form.as_table }}
-                    <span class="btn" onclick="inline_formsets.get('answer_set-').remove_form(this.parentNode);">
-                        -
-                    </span>
-                </div>
+            <p>{{ form.form.task_list.label }}:</p>
+            <select name="{{ form.form.task_list.name }}" class="form-control" 
+                    {% if form.form.task_list.field.required %} required {% endif %}>
+                <option value="" disabled {% if not form.form.task_list.value %} selected {% endif %}>
+                    {{ form.form.task_list.help_text }}
+                </option>
+                {% for choice in form.form.fields.task_list.queryset %}
+                    <option value="{{ choice.pk }}"
+                            {% if form.form.task_list.value %} selected {% endif %}>
+                        {{ choice.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% for error in form.form.task_list.errors %}
+                <p class="error">{{ error }}</p>
             {% endfor %}
-        </div>
-        <span class="btn" onclick="inline_formsets.get('answer_set-').add_inline_form();">+</span>
-        <input type="submit" value="Створити тест">
-    </form>
+
+            <br>
+            <p>{{ form.form.text.label }}:</p>
+            <textarea name="{{ form.form.text.name }}" class="form-control" 
+                      placeholder="{{ form.form.text.help_text }}"
+            >{{form.form.text.value}}</textarea>
+            {% for error in form.form.text.errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+            
+            {{ form.formset.management_form }}
+            {% for error in form.formset.non_form_errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+            <div class="inline-form-header">Варіанти відповідей</div>
+            
+            <table width="100%">
+                <thead>
+                    <tr>
+                        <th class="small-col">Видалити</th>
+                        <th>Відповідь</th>
+                        <th class="small-col">Вага</th>
+                    </tr>
+                </thead>
+                <tbody data-inline-prefix="answer_set-">
+                    {% for answer_form in form.formset %}
+                        <tr data-inline-form="answer_set-">
+                            <td class="small-col">
+                                {% if answer_form.DELETE and answer_form.id.value %}
+                                    <input type="checkbox" class="form-control"
+                                        name="{{ answer_form.prefix }}-{{ answer_form.DELETE.name }}"
+                                        id="id_{{ answer_form.prefix }}-{{ answer_form.DELETE.name }}">
+                                {% endif %}
+                                {% if not answer_form.id.value %}
+                                    <span class="btn" 
+                                    onclick="inline_formsets.get('answer_set-').remove_form(
+                                        this.parentNode.parentNode);">
+                                        -
+                                    </span>
+                                {% endif %}
+                                <input type="hidden" 
+                                       name="{{ answer_form.prefix }}-{{ answer_form.test.name }}"
+                                       value="{{ answer_form.test.value }}">
+                                <input type="hidden" name="{{ answer_form.prefix }}-id"
+                                    {% if answer_form.id.value %} 
+                                            value="{{ answer_form.id.value }}" 
+                                    {% endif %}>
+                            </td>
+                            <td>
+                                <textarea name="{{ answer_form.prefix }}-{{ answer_form.text.name }}" 
+                                    class="form-control" 
+                                    placeholder="{{ answer_form.text.label }}"
+                                >{{ answer_form.text.value }}</textarea>
+                            </td>
+                            <td class="small-col">
+                                <input type="number" class="form-control"
+                                    name="{{ answer_form.prefix }}-{{ answer_form.weight.name }}"
+                                    value="{{ answer_form.weight.value }}" min="0"
+                                    id="id_{{ answer_form.prefix }}-{{ answer_form.weight.name }}">
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div onclick="inline_formsets.get('answer_set-').add_inline_form();"
+                 class="inline-form-add-btn">
+                Додати варіант відповіді
+            </div>
+            {% block submit_button %}
+            {% endblock %}
+        </form>
+    </div>
 {% endblock %}
 
 {% block scripts %}
