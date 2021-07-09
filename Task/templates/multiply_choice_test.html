@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block static_load %}
+    {% load static %}
+    <script src="{% static 'JustTesting/js/inline_formset.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.form.as_table }}
+        {{ form.formset.management_form }}
+        {{ form.formset.non_form_errors }}
+        <div id="formset" data-inline-prefix="answer_set-">
+            {% for answer_form in form.formset %}
+                <div class="answer_form" data-inline-form="answer_set-"> 
+                    {{ answer_form.as_table }}
+                    <span class="btn" onclick="inline_formsets.get('answer_set-').remove_form(this.parentNode);">
+                        -
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+        <span class="btn" onclick="inline_formsets.get('answer_set-').add_inline_form();">+</span>
+        <input type="submit" value="Створити тест">
+    </form>
+{% endblock %}
+
+{% block scripts %}
+    <script>add_inline_formset();</script>
+{% endblock %}
