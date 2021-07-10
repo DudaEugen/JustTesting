@@ -1,5 +1,7 @@
 from django.db import models
+from django.db.models.aggregates import Min
 from Task.models import TaskList
+from django.core.validators import MinValueValidator
 
 
 class Test(models.Model):
@@ -63,6 +65,7 @@ class M2MTaskListInTest(models.Model):
         db_column="tasklist_id",
     )
     task_count = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1)],
         null=False,
         blank=False,
         verbose_name="Кількість завдань",
