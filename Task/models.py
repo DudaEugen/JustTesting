@@ -80,6 +80,8 @@ class MultiplyChoiceTestAnswer(models.Model):
     )
     weight = models.PositiveSmallIntegerField(
         default=0,
+        null=False,
+        blank=False,
         verbose_name="Вага",
         help_text="Чим більше число, тим більший відсоток дасть вибір цього варіанту. 0 - невірний варіант",
     )
