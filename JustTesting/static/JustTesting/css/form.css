@@ -43,6 +43,7 @@ thead
 {
     position: sticky;
     top: 0;
+    z-index: 2;
     background-color: bisque;
 }
 
@@ -64,4 +65,12 @@ td
 {
     width: 90px;
     text-align: center;
+}
+
+input[type=checkbox] {
+    transform: scale(1.2);
+}
+
+.delete-inline-form {
+    font-weight: bold;
 }

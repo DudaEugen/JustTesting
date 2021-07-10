@@ -60,10 +60,10 @@
                                         id="id_{{ answer_form.prefix }}-{{ answer_form.DELETE.name }}">
                                 {% endif %}
                                 {% if not answer_form.id.value %}
-                                    <span class="btn" 
+                                    <span class="btn btn-danger delete-inline-form" 
                                     onclick="inline_formsets.get('answer_set-').remove_form(
                                         this.parentNode.parentNode);">
-                                        -
+                                        &ndash;
                                     </span>
                                 {% endif %}
                                 <input type="hidden" 
