@@ -1,15 +1,14 @@
-from typing import Optional
 from abc import ABC, abstractmethod
 from django import forms
 
 
 class ModelAndInlineFormsetContainer(ABC):
     model = None
-    model_fields = ()
-    formset_model = None
-    formset_model_fields = ()
-    formset = None
-    formset_model_foreignkey_name = ""
+    model_fields = None
+    inline_model = None
+    inline_model_fields = None
+    inline_form = forms.ModelForm
+    formset = forms.BaseInlineFormSet
 
     def __init__(self, **kwargs):
         f = forms.modelform_factory(
@@ -20,12 +19,13 @@ class ModelAndInlineFormsetContainer(ABC):
         instance_of_model = kwargs.get("instance")
         formset_factory = forms.inlineformset_factory(
             self.model,
-            self.formset_model,
+            self.inline_model,
+            form=self.inline_form,
             formset=self.formset,
-            fields=self.formset_model_fields,
+            fields=self.inline_model_fields,
             extra=2 if instance_of_model is None else 1,
         )
-        q = self.formset_model.objects.none() if instance_of_model is None else\
+        q = self.inline_model.objects.none() if instance_of_model is None else\
             self.__class__.get_queryset(instance_of_model)
         self.formset = formset_factory(
             queryset=q,
