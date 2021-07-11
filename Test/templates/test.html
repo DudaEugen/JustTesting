@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block static_load %}
+    {% load static %}
+    <script src="{% static 'JustTesting/js/inline_formset.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="form-wrapper">
+        <form method="post">
+        {% csrf_token %}
+            <input type="text" name="{{ form.form.name.name }}"
+                   class="form-control" placeholder="{{ form.form.name.help_text }}"
+                   {% if form.form.name.value %} value="{{ form.form.name.value }}" {% endif %}
+                   {% if form.form.name.field.required %} required {% endif %}
+                   maxlength="{{ form.form.name.field.max_length }}">
+            {% for error in form.form.name.errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+
+            <br>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">{{ form.form.duration.label }}:</span>
+                </div>
+                <input type="number" name="{{ form.form.duration.name }}" class="form-control" 
+                       placeholder="{{ form.form.duration.help_text }}"
+                       {% if form.form.duration.value %} 
+                            value="{{ form.form.duration.value }}" 
+                       {% endif %}
+                       {% if form.form.duration.field.required %} required {% endif %}
+                       min="1">
+            </div>
+            {% for error in form.form.duration.errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+            
+            <p>
+                <input type="checkbox" name="{{ form.form.is_allowed.name }}"
+                       {% if form.form.is_allowed.value %} checked {% endif %}
+                       id="id_{{ form.form.is_allowed.name }}">
+                <label for="id_{{ form.form.is_allowed.name }}" style="margin-bottom: 0;">
+                    {{ form.form.is_allowed.label }}
+                </label>
+                <br>
+                <small>{{ form.form.is_allowed.help_text }}</small>
+            </p>
+
+            <p>
+                <input type="checkbox" name="{{ form.form.is_allow_for_unautorized_users.name }}"
+                       {% if form.form.is_allow_for_unautorized_users.value %} checked {% endif %}
+                       id="id_{{ form.form.is_allow_for_unautorized_users.name }}">
+                <label for="id_{{ form.form.is_allow_for_unautorized_users.name }}" 
+                       style="margin-bottom: 0;">
+                    {{ form.form.is_allow_for_unautorized_users.label }}
+                </label>
+                <br>
+                <small>{{ form.form.is_allow_for_unautorized_users.help_text }}</small>
+            </p>
+
+            {{ form.formset.management_form }}
+            {% for error in form.formset.non_form_errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+            <div class="inline-form-header">Списки завдань</div>
+
+            <table width="100%">
+                <thead>
+                    <tr>
+                        <th class="small-col">Видалити</th>
+                        <th>Список завдань</th>
+                        <th class="small-col">Кількість завдань</th>
+                    </tr>
+                </thead>
+                <tbody data-inline-prefix="m2mtasklistintest_set-">
+                    {% for task_list_form in form.formset %}
+                        <tr data-inline-form="m2mtasklistintest_set-">
+                            <td class="small-col">
+                                {% if task_list_form.DELETE and task_list_form.id.value %}
+                                    <input type="checkbox" class="form-control"
+                                        name="{{ task_list_form.prefix }}-{{ task_list_form.DELETE.name }}">
+                                {% endif %}
+                                {% if not task_list_form.id.value %}
+                                    <span class="btn btn-danger delete-inline-form" 
+                                    onclick="inline_formsets.get('m2mtasklistintest_set-').remove_form(
+                                        this.parentNode.parentNode);">
+                                        &ndash;
+                                    </span>
+                                {% endif %}
+                                <input type="hidden" 
+                                       name="{{ task_list_form.prefix }}-{{ task_list_form.test.name }}"
+                                       value="{{ task_list_form.test.value }}">
+                                <input type="hidden" name="{{ task_list_form.prefix }}-id"
+                                    {% if task_list_form.id.value %} 
+                                            value="{{ task_list_form.id.value }}" 
+                                    {% endif %}>
+                            </td>
+                            <td>
+                                <select class="form-control"
+                                 name="{{ task_list_form.prefix }}-{{ task_list_form.task_list.name }}">
+                                    <option value="" disabled 
+                                            {% if not task_list_form.task_list.value %} selected {% endif %}>
+                                        &mdash; &mdash; &mdash;
+                                    </option>
+                                    {% for choice in task_list_form.fields.task_list.queryset %}
+                                        <option value="{{ choice.pk }}"
+                                                {% if task_list_form.task_list.value == choice.pk %} 
+                                                    selected 
+                                                {% endif %}>
+                                            {{ choice.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td class="small-col">
+                                <input type="number" class="form-control" min="1"
+                                    name="{{ task_list_form.prefix }}-{{ task_list_form.task_count.name }}"
+                                    {% if task_list_form.task_count.value %}
+                                        value="{{ task_list_form.task_count.value }}" 
+                                    {% endif %}>
+                                {% for error in task_list_form.task_count.errors %}
+                                    <p class="error">{{ error }}</p>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% if task_list_form.non_field_errors %}
+                            <tr>
+                                <td></td>
+                                <td colspan="2">
+                                    {% for error in task_list_form.non_field_errors %}
+                                        <p class="error">{{ error }}</p>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div onclick="inline_formsets.get('m2mtasklistintest_set-').add_inline_form();"
+                 class="inline-form-add-btn">
+                Додати список завдань
+            </div>
+            {% block submit_button %}
+            {% endblock %}
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>add_inline_formset();</script>
+{% endblock %}
