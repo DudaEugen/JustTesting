@@ -18,7 +18,7 @@
                 </option>
                 {% for choice in form.form.fields.task_list.queryset %}
                     <option value="{{ choice.pk }}"
-                            {% if form.form.task_list.value == choice.pk %} selected {% endif %}>
+                            {% if form.form.task_list.value|to_int == choice.pk %} selected {% endif %}>
                         {{ choice.name }}
                     </option>
                 {% endfor %}
