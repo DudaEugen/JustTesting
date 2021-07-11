@@ -45,21 +45,21 @@ class MultiplyChoiceTest(Task):
         return f"self.text[:50]..." if len(self.text) > 50 else self.text
 
     class Meta:
-        verbose_name = "Тест з вибором кількох варіантів відповіді"
-        verbose_name_plural = "Тести з вибором кількох варіантів відповіді"
+        verbose_name = "Завдання з вибором кількох варіантів відповіді"
+        verbose_name_plural = "Завдання з вибором кількох варіантів відповіді"
 
     @staticmethod
     def find_errors_in_answer_list(answers: list) -> Optional[str]:
         if len(answers) < 2:
-            return "Тест має містити не менше 2 варіантів відповіді"
+            return "Завдання має містити не менше 2 варіантів відповіді"
         sum_weight: int = 0
         for i in range(len(answers)):
             sum_weight += answers[i].weight
             for j in range(i):
                 if answers[i].text == answers[j].text:
-                    return f"Тест містить два однакових варіанти відповіді: {i+1} та {j+1}"
+                    return f"Завданя містить два однакових варіанти відповіді: {i+1} та {j+1}"
         if sum_weight == 0:
-            return "Тест не містить варіантів відповіді, що позначені як вірні"
+            return "Завдання не містить варіантів відповіді, що позначені як вірні"
 
 
 class MultiplyChoiceTestAnswer(models.Model):
