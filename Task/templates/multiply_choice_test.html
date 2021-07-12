@@ -31,7 +31,7 @@
             <p>{{ form.form.text.label }}:</p>
             <textarea name="{{ form.form.text.name }}" class="form-control" 
                       placeholder="{{ form.form.text.help_text }}"
-            >{{form.form.text.value}}</textarea>
+            >{% if form.form.text.value %}{{ form.form.text.value }}{% endif %}</textarea>
             {% for error in form.form.text.errors %}
                 <p class="error">{{ error }}</p>
             {% endfor %}
@@ -78,7 +78,10 @@
                                 <textarea name="{{ answer_form.prefix }}-{{ answer_form.text.name }}" 
                                     class="form-control" 
                                     placeholder="{{ answer_form.text.label }}"
-                                >{{ answer_form.text.value }}</textarea>
+                                >{% if answer_form.text.value %}{{ answer_form.text.value }}{% endif %}</textarea>
+                                {% for error in answer_form.text.errors %}
+                                    <p class="error">{{ error }}</p>
+                                {% endfor %}
                             </td>
                             <td class="small-col">
                                 <input type="number" class="form-control"

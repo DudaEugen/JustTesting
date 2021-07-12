@@ -1,5 +1,5 @@
 from django.db import models
-from typing import Optional
+from typing import List, Iterable
 
 
 class TaskList(models.Model):
@@ -48,18 +48,38 @@ class MultiplyChoiceTest(Task):
         verbose_name = "Завдання з вибором кількох варіантів відповіді"
         verbose_name_plural = "Завдання з вибором кількох варіантів відповіді"
 
+    def clean(self):
+        from django.forms import ValidationError
+        from django.utils.translation import ugettext_lazy as _
+
+        super().clean()
+        if self.text == "":
+            raise ValidationError({"text": _("Завдання має містити текст")})
+
     @staticmethod
-    def find_errors_in_answer_list(answers: list) -> Optional[str]:
+    def clean_answer_set(answers: Iterable):
+        from django.forms import ValidationError
+        from django.utils.translation import ugettext_lazy as _
+
         if len(answers) < 2:
-            return "Завдання має містити не менше 2 варіантів відповіді"
+            raise ValidationError(
+                "Завдання має містити не менше 2 варіантів відповіді"
+            )
+        errors: List[ValidationError] = []
         sum_weight: int = 0
         for i in range(len(answers)):
             sum_weight += answers[i].weight
             for j in range(i):
                 if answers[i].text == answers[j].text:
-                    return f"Завданя містить два однакових варіанти відповіді: {i+1} та {j+1}"
+                    errors.append(ValidationError(
+                        f"Завданя містить два однакових варіанти відповіді: {j+1} та {i+1}"
+                    ))
         if sum_weight == 0:
-            return "Завдання не містить варіантів відповіді, що позначені як вірні"
+            errors.append(ValidationError(
+                "Завдання не містить варіантів відповіді, що позначені як вірні"
+            ))
+        if errors:
+            raise ValidationError(errors)
 
 
 class MultiplyChoiceTestAnswer(models.Model):
@@ -93,3 +113,13 @@ class MultiplyChoiceTestAnswer(models.Model):
         verbose_name = "Варіант відповіді на тест з вибором кількох варіантів"
         verbose_name_plural = "Варіанти відповіді на тести з вибором кількох варіантів"
         default_related_name = "answer_set"
+
+    def clean(self):
+        from django.forms import ValidationError
+        from django.utils.translation import ugettext_lazy as _
+
+        super().clean()
+        if self.text == "":
+            raise ValidationError(
+                {"text": _("Варіант відповіді має містити текст")}
+            )

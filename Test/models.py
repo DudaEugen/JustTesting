@@ -80,3 +80,15 @@ class M2MTaskListInTest(models.Model):
         verbose_name_plural = "Списки питань в тесті"
         db_table = "Test_tasklist_Test"
         unique_together = [["test", "task_list"]]
+
+    def clean(self):
+        from django.forms import ValidationError
+        from django.utils.translation import ugettext_lazy as _
+
+        max_task_count = self.task_list.task_set.all().count()
+        if max_task_count < self.task_count:
+            raise ValidationError(
+                f'Cписок завдань "{self.task_list}" містить всього '
+                f'{max_task_count} завдань. Тому з цього списку не можна взяти '
+                f'{self.task_count} завдань.'
+            )

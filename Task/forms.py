@@ -1,5 +1,5 @@
 from django import forms
-from typing import List, Optional
+from typing import List
 from .models import *
 from JustTesting.utils.formsets import ModelAndInlineFormsetContainer
 
@@ -16,11 +16,7 @@ class MultiplyChoiceTestAnswerInlineFormset(forms.models.BaseInlineFormSet):
                         text=answer_text,
                         weight=answer_weight
                     ))
-        errors: Optional[str] = MultiplyChoiceTest.find_errors_in_answer_list(
-            answers
-        )
-        if errors is not None:
-            raise forms.ValidationError(errors)
+        MultiplyChoiceTest.clean_answer_set(answers)
 
 
 class MultiplyChoiceTestWithAnswersForm(ModelAndInlineFormsetContainer):
