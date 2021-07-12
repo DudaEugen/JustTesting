@@ -25,8 +25,15 @@ class InlineFormset {
                             let pref = this.prefixes[p];
                             if (attrib.value.substring(0, pref.length) === pref &&
                                 attrib.name != inline_formset_attr) {
+                                let index_len = 1;
+                                for (let k = pref.length + 1; k < attrib.value.length; ++k) {
+                                    if (attrib.value[k] === "-") {
+                                        break;
+                                    }
+                                    ++index_len;
+                                }
                                 attrib.value = pref + String(this.max_index) +
-                                    attrib.value.substring(pref.length + 1, attrib.value.length);
+                                    attrib.value.substring(pref.length + index_len, attrib.value.length);
                                 break;
                             }
                         }
