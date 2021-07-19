@@ -126,7 +126,7 @@ class MultiplyChoiceTestAnswer(models.Model):
     This does not require any additional action when saving the task 
     to the database or transferring it to the user.
     """
-    identificator = models.UUIDField(
+    id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
