@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 from Test.models import Test
-from Task.models import Task
+from Task.models import Task, MultipleChoiceTestAnswer
 from django.db.models.signals import post_save
 
 
@@ -59,8 +60,6 @@ class TestingSession(models.Model):
         super().save()
 
     def _set_begin_and_end_if_none(self):
-        from django.utils import timezone
-
         if not self.begin:
             self.begin = timezone.now()
         if not self.end:
@@ -77,6 +76,8 @@ class M2MTaskInTestingSession(models.Model):
         task: Task.
         is_completed: True if task is completed else False.
         order: Field for ordering tasks in testing_session (if equal ordering by pk).
+        issue_datetime: date and time of issue of task. 
+                        None if the task was not issued.
     """
     session = models.ForeignKey(
         TestingSession,
@@ -107,6 +108,12 @@ class M2MTaskInTestingSession(models.Model):
         default=0,
         verbose_name="Розташування завдання",
         help_text="Чим більше значення, тим пізніше це завдання буде знаходитись у списку завдань сесії",
+    )
+    issue_datetime = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Видано",
+        help_text="Дата та час видачі завдання",
     )
 
     class Meta:
@@ -193,3 +200,46 @@ post_save.connect(
     _create_task_set_for_test_session,
     sender=TestingSessionOfUnautorizedUser
 )
+
+
+class Solution(models.Model):
+    """
+    Base class for solutions in testing session.
+
+    Attributes:
+        task_in_testing_session: link to M2MTaskInTestingSession.
+        datetime: Date and time of solution create.
+        result: Result of solution in percents.
+    """
+    task_in_testing_session = models.OneToOneField(
+        M2MTaskInTestingSession,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        verbose_name="Завдання з сесії тестування",
+        help_text="Завдання, для якого було отримано цей розв'язок",
+    )
+    datetime = models.DateTimeField(
+        null=False,
+        default=timezone.now,
+        verbose_name="Дата та час",
+        help_text="Дата та час отримання розв'язку завдання",
+    )
+    result = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        verbose_name="Результат, %",
+        help_text="Результат розв'язку у відсотках",
+    )
+
+
+class MultipleChoiceTestSolution(Solution):
+    """
+    Solution of MultipleChoiceTest.
+    """
+    selected_answers = models.ManyToManyField(
+        MultipleChoiceTestAnswer,
+        verbose_name="Відповіді",
+        help_text="Обрані варіанти відповідей",
+    )
