@@ -5,6 +5,19 @@ from django.core.validators import MinValueValidator
 
 
 class Test(models.Model):
+    """
+    Instruction for create testing session.
+    User selects Test and then TestSession is created.
+
+    Attributes:
+        name: Name of test.
+        task_lists: A collection of TaskLists 
+                    with number of tasks to be taken frome each TaskList.
+        duration: Max duration of testing session.
+        is_allowed: Users view and can select this test.
+        is_allow_for_unautorized_users: Unautorized users view and 
+                    can select this test. Ignored if is_allowed is False.
+    """
     name = models.CharField(
         max_length=150,
         unique=True,

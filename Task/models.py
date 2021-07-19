@@ -3,6 +3,12 @@ from typing import List, Iterable
 
 
 class TaskList(models.Model):
+    """
+    List of tasks. Tasks can be of defferent types.
+
+    When creating a testing session, 
+    tasks are randomly selected from the list of tasks.
+    """
     name = models.CharField(
         max_length=250,
         unique=True,
@@ -22,6 +28,14 @@ class TaskList(models.Model):
 
 
 class Task(models.Model):
+    """
+    Base class for tasks.
+
+    Task is not abstract class in order to be able 
+    to take tasks of different types from the database, 
+    regardless of their types. To do this, it is enough 
+    to place tasks of different types in one task_list.
+    """
     task_list = models.ForeignKey(
         TaskList,
         on_delete=models.CASCADE,
@@ -33,6 +47,16 @@ class Task(models.Model):
 
 
 class MultiplyChoiceTest(Task):
+    """
+    Task with multiple choice.
+
+    Each answer option of MultiplyChoiceTest has an attribute 'weight'.
+    Weight is equal 0 if answer option is wrong.
+    The result of task is 0 if one of the selected answer options is wrong option.
+    Otherwise, the result is equal to the product of 100% and
+    the sum of the weights of selected answer options, 
+    divide by sum of the weights of all options for the task.
+    """
     text = models.TextField(
         null=True,
         blank=True,
@@ -58,10 +82,16 @@ class MultiplyChoiceTest(Task):
 
     @staticmethod
     def clean_answer_set(answers: Iterable):
+        """
+        raise django.forms.ValidationError if 
+        answers is incorrect collection of answers for MultiplyChoiceTest.
+        :param answers: Iterable[MultiplyChoiceTestAnswer]
+        """
         from django.forms import ValidationError
         from django.utils.translation import ugettext_lazy as _
 
         if len(answers) < 2:
+            # task must be have 2 or more answer options.
             raise ValidationError(
                 "Завдання має містити не менше 2 варіантів відповіді"
             )
@@ -71,10 +101,12 @@ class MultiplyChoiceTest(Task):
             sum_weight += answers[i].weight
             for j in range(i):
                 if answers[i].text == answers[j].text:
+                    # all answer options must be different.
                     errors.append(ValidationError(
                         f"Завданя містить два однакових варіанти відповіді: {j+1} та {i+1}"
                     ))
         if sum_weight == 0:
+            # task must be have 1 or more answer options with non zero weight.
             errors.append(ValidationError(
                 "Завдання не містить варіантів відповіді, що позначені як вірні"
             ))
@@ -83,6 +115,9 @@ class MultiplyChoiceTest(Task):
 
 
 class MultiplyChoiceTestAnswer(models.Model):
+    """
+    Answer option to task with multiple choice.
+    """
     test = models.ForeignKey(
         MultiplyChoiceTest,
         on_delete=models.CASCADE,

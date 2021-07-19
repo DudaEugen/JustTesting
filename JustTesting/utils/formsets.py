@@ -3,6 +3,24 @@ from django import forms
 
 
 class ModelAndInlineFormsetContainer(ABC):
+    """
+    Abstract class for association 
+    form of model and inline formset for this model.
+
+    Attributes:
+        model: Model for create ModelForm.
+        fields: Fields of model for create ModelForm.
+        inline_model: Model for create inline formset.
+        inline_model_fields: Fields of model for create inline formset.
+        inline_form: Form for create inline formset.
+        formset: Formset.
+
+    Implement class must realize classmethod get_queryset and specify values:
+    model
+    fields
+    inline_model and inline_model_fields or/and inline_form
+    optionally formset
+    """
     model = None
     model_fields = None
     inline_model = None
@@ -35,6 +53,10 @@ class ModelAndInlineFormsetContainer(ABC):
     @classmethod
     @abstractmethod
     def get_queryset(cls, instance):
+        """
+        Called if instance was be passed to constructor.
+        :return: QuerySet of objects for create forms for inline formset.        
+        """
         pass
 
     def is_valid(self):
