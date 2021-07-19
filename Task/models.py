@@ -47,11 +47,11 @@ class Task(models.Model):
     )
 
 
-class MultiplyChoiceTest(Task):
+class MultipleChoiceTest(Task):
     """
     Task with multiple choice.
 
-    Each answer option of MultiplyChoiceTest has an attribute 'weight'.
+    Each answer option of MultipleChoiceTest has an attribute 'weight'.
     Weight is equal 0 if answer option is wrong.
     The result of task is 0 if one of the selected answer options is wrong option.
     Otherwise, the result is equal to the product of 100% and
@@ -85,8 +85,8 @@ class MultiplyChoiceTest(Task):
     def clean_answer_set(answers: Iterable):
         """
         raise django.forms.ValidationError if 
-        answers is incorrect collection of answers for MultiplyChoiceTest.
-        :param answers: Iterable[MultiplyChoiceTestAnswer]
+        answers is incorrect collection of answers for MultipleChoiceTest.
+        :param answers: Iterable[MultipleChoiceTestAnswer]
         """
         from django.forms import ValidationError
         from django.utils.translation import ugettext_lazy as _
@@ -115,7 +115,7 @@ class MultiplyChoiceTest(Task):
             raise ValidationError(errors)
 
 
-class MultiplyChoiceTestAnswer(models.Model):
+class MultipleChoiceTestAnswer(models.Model):
     """
     Answer option to task with multiple choice.
 
@@ -132,7 +132,7 @@ class MultiplyChoiceTestAnswer(models.Model):
         editable=False,
     )
     test = models.ForeignKey(
-        MultiplyChoiceTest,
+        MultipleChoiceTest,
         on_delete=models.CASCADE,
         null=False,
         blank=False,

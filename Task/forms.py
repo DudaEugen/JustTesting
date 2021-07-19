@@ -4,27 +4,27 @@ from .models import *
 from JustTesting.utils.formsets import ModelAndInlineFormsetContainer
 
 
-class MultiplyChoiceTestAnswerInlineFormset(forms.models.BaseInlineFormSet):
+class MultipleChoiceTestAnswerInlineFormset(forms.models.BaseInlineFormSet):
     def clean(self):
-        answers: List[MultiplyChoiceTestAnswer] = []
+        answers: List[MultipleChoiceTestAnswer] = []
         for form in self.forms:
             if form.cleaned_data and not form.cleaned_data["DELETE"]:
                 answer_text = form.cleaned_data.get("text")
                 answer_weight = form.cleaned_data.get("weight")
                 if answer_text is not None and answer_weight is not None:
-                    answers.append(MultiplyChoiceTestAnswer(
+                    answers.append(MultipleChoiceTestAnswer(
                         text=answer_text,
                         weight=answer_weight
                     ))
-        MultiplyChoiceTest.clean_answer_set(answers)
+        MultipleChoiceTest.clean_answer_set(answers)
 
 
-class MultiplyChoiceTestWithAnswersForm(ModelAndInlineFormsetContainer):
-    model = MultiplyChoiceTest
+class MultipleChoiceTestWithAnswersForm(ModelAndInlineFormsetContainer):
+    model = MultipleChoiceTest
     model_fields = ("task_list", "text")
-    inline_model = MultiplyChoiceTestAnswer
+    inline_model = MultipleChoiceTestAnswer
     inline_model_fields = "__all__"
-    formset = MultiplyChoiceTestAnswerInlineFormset
+    formset = MultipleChoiceTestAnswerInlineFormset
 
     @classmethod
     def get_queryset(cls, instance):

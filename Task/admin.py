@@ -1,12 +1,12 @@
 from django.contrib import admin
 from .models import *
-from .forms import MultiplyChoiceTestAnswerInlineFormset
+from .forms import MultipleChoiceTestAnswerInlineFormset
 from Test.models import Test
 
 
-class MultiplyChoiceTestAnswerInline(admin.TabularInline):
-    model = MultiplyChoiceTestAnswer
-    formset = MultiplyChoiceTestAnswerInlineFormset
+class MultipleChoiceTestAnswerInline(admin.TabularInline):
+    model = MultipleChoiceTestAnswer
+    formset = MultipleChoiceTestAnswerInlineFormset
     extra = 0
     verbose_name = "Варіант відповіді"
     verbose_name_plural = "Варіанти відповіді"
@@ -33,7 +33,7 @@ class TaskListAdmin(admin.ModelAdmin):
     )
 
 
-class MultiplyChoiceTestAdmin(admin.ModelAdmin):
+class MultipleChoiceTestAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
         "__str__",
@@ -43,9 +43,9 @@ class MultiplyChoiceTestAdmin(admin.ModelAdmin):
         "text",
     )
     inlines = (
-        MultiplyChoiceTestAnswerInline,
+        MultipleChoiceTestAnswerInline,
     )
 
 
 admin.site.register(TaskList, TaskListAdmin)
-admin.site.register(MultiplyChoiceTest, MultiplyChoiceTestAdmin)
+admin.site.register(MultipleChoiceTest, MultipleChoiceTestAdmin)
