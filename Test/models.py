@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models.aggregates import Min
 from Task.models import TaskList
 from django.core.validators import MinValueValidator
 
@@ -7,7 +6,7 @@ from django.core.validators import MinValueValidator
 class Test(models.Model):
     """
     Instruction for create testing session.
-    User selects Test and then TestSession is created.
+    User selects Test and then TestingSession is created.
 
     Attributes:
         name: Name of test.
