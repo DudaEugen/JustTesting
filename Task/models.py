@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 from typing import List, Iterable
 
 
@@ -117,7 +118,19 @@ class MultiplyChoiceTest(Task):
 class MultiplyChoiceTestAnswer(models.Model):
     """
     Answer option to task with multiple choice.
+
+    Id is uuid, because this type does not give users information 
+    about the position of the answer option among others when creating a task. 
+    (For example, with int, the user can understand that 
+    the variant with the smallest number was the first) 
+    This does not require any additional action when saving the task 
+    to the database or transferring it to the user.
     """
+    identificator = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
     test = models.ForeignKey(
         MultiplyChoiceTest,
         on_delete=models.CASCADE,
