@@ -10,32 +10,29 @@
     <div class="form-wrapper">
         <form method="post">
         {% csrf_token %}
-            <p>{{ form.form.task_list.label }}:</p>
-            <select name="{{ form.form.task_list.name }}" class="form-control" 
-                    {% if form.form.task_list.field.required %} required {% endif %}>
-                <option value="" disabled {% if not form.form.task_list.value %} selected {% endif %}>
-                    {{ form.form.task_list.help_text }}
-                </option>
-                {% for choice in form.form.fields.task_list.queryset %}
-                    <option value="{{ choice.pk }}"
-                            {% if form.form.task_list.value|to_int == choice.pk %} selected {% endif %}>
-                        {{ choice.name }}
-                    </option>
-                {% endfor %}
-            </select>
-            {% for error in form.form.task_list.errors %}
-                <p class="error">{{ error }}</p>
-            {% endfor %}
+            <!-- model form -->
+            {% with form=form.form %}
+                <!-- select task list -->
+                {% with select=form.task_list %}
+                {% with queryset=form.fields.task_list.queryset%}
+                {% with disabled_option_text=form.task_list.help_text %}
+                    <p>{{ select.label }}:</p>
+                    {% include "forms/select.html"%}
+                {% endwith %}
+                {% endwith %}
+                {% endwith %}
 
-            <br>
-            <p>{{ form.form.text.label }}:</p>
-            <textarea name="{{ form.form.text.name }}" class="form-control" 
-                      placeholder="{{ form.form.text.help_text }}"
-            >{% if form.form.text.value %}{{ form.form.text.value }}{% endif %}</textarea>
-            {% for error in form.form.text.errors %}
-                <p class="error">{{ error }}</p>
-            {% endfor %}
+                <br>
+                <p>{{ form.text.label }}:</p>
+                <textarea name="{{ form.text.name }}" class="form-control" 
+                        placeholder="{{ form.text.help_text }}"
+                >{% if form.text.value %}{{ form.text.value }}{% endif %}</textarea>
+                {% for error in form.text.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            {% endwith %}
             
+            <!-- inline forms -->
             {{ form.formset.management_form }}
             {% for error in form.formset.non_form_errors %}
                 <p class="error">{{ error }}</p>

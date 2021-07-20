@@ -97,21 +97,16 @@
                                     {% endif %}>
                             </td>
                             <td>
-                                <select class="form-control"
-                                 name="{{ task_list_form.prefix }}-{{ task_list_form.task_list.name }}">
-                                    <option value="" disabled 
-                                            {% if not task_list_form.task_list.value %} selected {% endif %}>
-                                        &mdash; &mdash; &mdash;
-                                    </option>
-                                    {% for choice in task_list_form.fields.task_list.queryset %}
-                                        <option value="{{ choice.pk }}"
-                                                {% if task_list_form.task_list.value|to_int == choice.pk %} 
-                                                    selected 
-                                                {% endif %}>
-                                            {{ choice.name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
+                                <!-- select task list -->
+                                {% with select=task_list_form.task_list %}
+                                {% with prefix=task_list_form.prefix %}
+                                {% with queryset=task_list_form.fields.task_list.queryset %}
+                                {% with disabled_option_text="&mdash; &mdash; &mdash;" %}
+                                    {% include "forms/select.html" with required=False %}
+                                {% endwith %}
+                                {% endwith %}
+                                {% endwith %}
+                                {% endwith %}
                             </td>
                             <td class="small-col">
                                 <input type="number" class="form-control" min="1"

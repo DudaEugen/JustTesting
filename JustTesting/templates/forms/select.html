@@ -1,0 +1,27 @@
+<select name="{% if prefix %}{{ prefix }}-{% endif %}{{ select.name }}" class="form-control" 
+    {% if required is None %}
+        {% if select.field.required %} 
+            required 
+        {% endif %}
+    {% else %}
+        {% if required %}
+            required
+        {% endif %}
+    {% endif %}
+>
+    {% if disabled_option_text %}
+        <option value="" disabled {% if not select.value %} selected {% endif %}>
+            {{ disabled_option_text }}
+        </option>
+    {% endif %}
+    {% for choice in queryset %}
+        <option value="{{ choice.pk|stringformat:'s' }}"
+            {% if select.value|stringformat:'s' == choice.pk|stringformat:'s' %} selected {% endif %}>
+            {{ choice.name }}
+        </option>
+    {% endfor %}
+</select>
+
+{% for error in select.errors %}
+    <p class="error">{{ error }}</p>
+{% endfor %}

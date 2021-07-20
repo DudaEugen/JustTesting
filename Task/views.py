@@ -1,7 +1,6 @@
 from django.views.generic import CreateView, UpdateView
 from .forms import MultipleChoiceTestWithAnswersForm
 from .models import *
-from JustTesting.utils.template_filters import to_int
 
 
 class MultipleChoiceTestCreateView(CreateView):
