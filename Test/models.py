@@ -32,6 +32,7 @@ class Test(models.Model):
         help_text="Списки, завдання з яких використовуються у тесті",
     )
     duration = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)],
         null=False,
         blank=False,
         verbose_name="Тривалість, хв",
