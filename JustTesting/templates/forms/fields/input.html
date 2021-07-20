@@ -1,0 +1,55 @@
+{% if label and input.field.widget.input_type != "checkbox" %}
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">{{ label }}</span>
+        </div>
+{% endif %}
+
+<input type="{{ input.field.widget.input_type }}" 
+       {% if input.field.widget.input_type != "checkbox" %} 
+            class="form-control"
+       {% endif %}
+       {% for attribute, value in input.field.widget.attrs.items %}
+            {{ attribute }}="{{ value }}"
+       {% endfor %}
+       name="{% if prefix %}{{ prefix }}-{% endif %}{{ input.name }}"
+       id="id_{% if prefix %}{{ prefix }}-{% endif %}{{ input.name }}"
+       {% if placeholder %} 
+            placeholder="{{ placeholder }}"
+       {% endif %}
+       {% if input.value is not None %} 
+            {% if input.field.widget.input_type != "checkbox" %}
+                value="{{ input.value }}"
+            {% elif input.value %}
+                checked
+            {% endif %} 
+       {% endif %}
+       {% if required is None %}
+            {% if input.field.required %} 
+                required 
+            {% endif %}
+       {% else %}
+            {% if required %}
+                required
+            {% endif %}
+       {% endif %}
+>
+
+{% if label %}
+    {% if input.field.widget.input_type != "checkbox" %}
+        </div>
+    {% else %}
+        <label for="id_{{ input.name }}" style="margin-bottom: 0;">
+            {{ input.label }}
+        </label>
+    {% endif %}
+{% endif %}
+
+{% if small_text %}
+    <br>
+    <small>{{ input.help_text }}</small>
+{% endif %}
+
+{% for error in input.errors %}
+    <p class="error">{{ error }}</p>
+{% endfor %}

@@ -1,0 +1,40 @@
+{% if label %}
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">{{ label }}</span>
+        </div>
+{% endif %}
+
+<select name="{% if prefix %}{{ prefix }}-{% endif %}{{ select.name }}"
+        id="id_{% if prefix %}{{ prefix }}-{% endif %}{{ select.name }}"
+        {% if required is None %}
+            {% if select.field.required %} 
+                required 
+            {% endif %}
+        {% else %}
+            {% if required %}
+                required
+            {% endif %}
+        {% endif %}
+        class="form-control">
+
+    {% if disabled_option_text %}
+        <option value="" disabled {% if not select.value %} selected {% endif %}>
+            {{ disabled_option_text }}
+        </option>
+    {% endif %}
+    {% for choice in queryset %}
+        <option value="{{ choice.pk|stringformat:'s' }}"
+            {% if select.value|stringformat:'s' == choice.pk|stringformat:'s' %} selected {% endif %}>
+            {{ choice.name }}
+        </option>
+    {% endfor %}
+</select>
+
+{% if label %}
+    </div>
+{% endif %}
+
+{% for error in select.errors %}
+    <p class="error">{{ error }}</p>
+{% endfor %}

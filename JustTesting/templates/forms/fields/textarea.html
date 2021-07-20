@@ -1,0 +1,11 @@
+<textarea class="form-control"
+          name="{% if prefix %}{{ prefix }}-{% endif %}{{ textarea.name }}"
+          id="id_{% if prefix %}{{ prefix }}-{% endif %}{{ textarea.name }}"
+          {% if placeholder %} 
+                placeholder="{{ placeholder }}"
+          {% endif %}
+>{% if textarea.value %}{{ textarea.value }}{% endif %}</textarea>
+                
+{% for error in textarea.errors %}
+    <p class="error">{{ error }}</p>
+{% endfor %}
