@@ -4,12 +4,8 @@ from django.utils import timezone
 from Test.models import Test
 from Task.models import Task, MultipleChoiceTestAnswer
 from django.db.models.signals import post_save
-from JustTesting.utils.mixins import MultiTableInheritanceBaseManagerMixin
+from JustTesting.utils.query import InheritanceManager
 from django.contrib.sessions.backends.base import SessionBase
-
-
-class TestingSessionManager(models.Manager, MultiTableInheritanceBaseManagerMixin):
-    pass
 
 
 class TestingSession(models.Model):
@@ -59,7 +55,7 @@ class TestingSession(models.Model):
         verbose_name="Результат, %",
         help_text="Результат тестування у відсотках",
     )
-    objects = TestingSessionManager()
+    objects = InheritanceManager()
 
     def save(self):
         if self._state.adding:
@@ -217,10 +213,6 @@ post_save.connect(
 )
 
 
-class SolutionManager(models.Manager, MultiTableInheritanceBaseManagerMixin):
-    pass
-
-
 class Solution(models.Model):
     """
     Base class for solutions in testing session.
@@ -251,7 +243,7 @@ class Solution(models.Model):
         verbose_name="Результат, %",
         help_text="Результат розв'язку у відсотках",
     )
-    objects = SolutionManager()
+    objects = InheritanceManager()
 
 
 class MultipleChoiceTestSolution(Solution):

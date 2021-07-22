@@ -1,7 +1,7 @@
 from django.db import models
 import uuid
 from typing import List, Iterable
-from JustTesting.utils.mixins import MultiTableInheritanceBaseManagerMixin
+from JustTesting.utils.query import InheritanceManager
 
 
 class TaskList(models.Model):
@@ -29,10 +29,6 @@ class TaskList(models.Model):
         ordering = ['name']
 
 
-class TaskManager(models.Manager, MultiTableInheritanceBaseManagerMixin):
-    pass
-
-
 class Task(models.Model):
     """
     Base class for tasks.
@@ -50,7 +46,7 @@ class Task(models.Model):
         verbose_name="Список завдань",
         help_text="Оберіть список завдань",
     )
-    objects = TaskManager()
+    objects = InheritanceManager()
 
 
 class MultipleChoiceTest(Task):
