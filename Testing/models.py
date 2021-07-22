@@ -5,6 +5,7 @@ from Test.models import Test
 from Task.models import Task, MultipleChoiceTestAnswer
 from django.db.models.signals import post_save
 from JustTesting.utils.mixins import MultiTableInheritanceBaseManagerMixin
+from django.contrib.sessions.backends.base import SessionBase
 
 
 class TestingSessionManager(models.Manager, MultiTableInheritanceBaseManagerMixin):
@@ -150,6 +151,14 @@ class TestingSessionOfUnautorizedUser(TestingSession):
     class Meta:
         verbose_name = "Сесія тестування неавторизованого користувача"
         verbose_name_plural = "Сесії тестувань неавторизованих користувачів"
+
+    def save(self, session: SessionBase):
+        super().save()
+        session["test_session_id"] = self.id
+        if session.get_expiry_date() < self.end:
+            # 1 hours after end it is time for take result of testing
+            # if user did not have time to finish testing on time.
+            session.set_expiry(self.end + timezone.timedelta(hours=1))
 
 
 class TestingSessionOfAutorizedUser(TestingSession):
