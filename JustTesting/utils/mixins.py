@@ -12,11 +12,11 @@ class MultiTableInheritanceBaseManagerMixin:
         return self._cast_to_derivative(base_instances)
 
     def select_related_filter(self, **kwargs) -> list:
-        base_instances = self.select_related().filter(**kwargs)
+        base_instances = self._select_related().filter(**kwargs)
         return self._cast_to_derivative(base_instances)
 
     def select_related_get(self, **kwargs):
-        base_instance = self.select_related().get(**kwargs)
+        base_instance = self._select_related().get(**kwargs)
         return self._cast_to_derivative(base_instance)
 
     def _cast_to_derivative(self, base_instances):
@@ -37,7 +37,6 @@ class MultiTableInheritanceBaseManagerMixin:
         return result
 
     def _select_related(self):
-        print()
         return self.select_related(
             *tuple(cl.__name__.lower() for cl in self.model.__subclasses__())
         )
