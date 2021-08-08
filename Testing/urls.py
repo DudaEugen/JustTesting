@@ -5,4 +5,5 @@ from .views import *
 urlpatterns = [
     url(r'^start$', TestingSessionCreateView.as_view(),
         name='create testing session'),
+    url(r'^session=(?P<pk>\d+)$', TestingView.as_view(), name='testing'),
 ]

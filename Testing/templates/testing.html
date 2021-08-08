@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Вибір тесту
+{% endblock %}
+
+{% block content %}
+    <div class="form-wrapper">
+        <form method="post">
+        {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Відповісти" class="btn btn-primary">
+        </form>
+    </div>
+{% endblock %}

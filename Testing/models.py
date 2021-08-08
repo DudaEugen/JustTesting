@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from Test.models import Test
-from Task.models import Task, MultipleChoiceTestAnswer
+from Task.models import Task, MultipleChoiceTestAnswer, MultipleChoiceTest
 from django.db.models.signals import post_save
 from JustTesting.utils.query import InheritanceManager
 from django.contrib.sessions.backends.base import SessionBase
@@ -250,8 +250,28 @@ class MultipleChoiceTestSolution(Solution):
     """
     Solution of MultipleChoiceTest.
     """
+    task_model = MultipleChoiceTest
     selected_answers = models.ManyToManyField(
         MultipleChoiceTestAnswer,
         verbose_name="Відповіді",
         help_text="Обрані варіанти відповідей",
     )
+
+    def save(self, commit: bool = True):
+        if commit:
+            self.result = self._calculate_result()
+        super().save(commit)
+
+    def _calculate_result(self) -> float:
+        selected_options_weight = 0
+        for option in self.selected_answers.all():
+            if option.weight == 0:
+                return 0
+            selected_options_weight += option.weight
+
+        sum_weight = 0
+        for option in self.task_in_testing_session.task.multiplechoicetest.answer_set.all():
+            sum_weight += option.weight
+
+        if sum_weight > 0:
+            return 100 * selected_options_weight/sum_weight
