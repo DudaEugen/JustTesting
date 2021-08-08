@@ -128,8 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-secrets/
-*.secret
 db_import/
 /static/
 /.db_backups/
