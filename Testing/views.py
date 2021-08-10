@@ -1,6 +1,6 @@
 from django.http.response import HttpResponseRedirect
 from django.views.generic import CreateView, FormView
-from django.shortcuts import get_object_or_404
+from django.http import Http404
 from .models import *
 from .forms import TestingSessionOfAutorizedUserForm, TestingSessionOfUnautorizedUserForm
 
@@ -41,9 +41,11 @@ class TestingView(FormView):
         import inspect
         from . import forms as f
 
-        task_in_session = get_object_or_404(
-            M2MTaskInTestingSession, pk=self.kwargs["pk"]
-        )
+        task_in_session = M2MTaskInTestingSession.objects.filter(
+            session_id=self.kwargs["pk"], is_completed=False
+        ).first()
+        if task_in_session is None:
+            raise Http404("Incorrect session pk")
         task = Task.objects.select_derivatives().get(pk=task_in_session.task.pk)
         for _, form_class in inspect.getmembers(sys.modules[f.__name__], inspect.isclass):
             is_task_model_form = hasattr(form_class, "Meta") and hasattr(form_class.Meta, "model") and \
