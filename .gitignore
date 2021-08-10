@@ -134,3 +134,4 @@ db_import/
 /templates/
 /media/
 .vscode/
+.idea/
