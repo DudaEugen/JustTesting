@@ -1,6 +1,28 @@
 from django import forms
 from django.forms import widgets
 from . import models
+from Test.models import Test
+from Task.models import MultipleChoiceTest
+
+
+class TestingSessionOfAutorizedUserForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["test"].queryset = Test.objects.filter(is_allowed=True)
+
+    class Meta:
+        model = models.TestingSessionOfAutorizedUser
+        fields = ["test"]
+
+
+class TestingSessionOfUnautorizedUserForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["test"].queryset = Test.objects.filter(is_allowed=True, is_allow_for_unautorized_users=True)
+
+    class Meta:
+        model = models.TestingSessionOfUnautorizedUser
+        fields = ["test", "information"]
 
 
 class MultipleChoiceTestSolutionForm(forms.ModelForm):
@@ -9,9 +31,10 @@ class MultipleChoiceTestSolutionForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
         self.task_in_testing_session = task_in_session
+        multiple_choice_test: MultipleChoiceTest = self.task_in_testing_session.task.multiplechoicetest
+        self.fields["selected_answers"].label = multiple_choice_test.text
         self.fields["selected_answers"].choices = [
-            (option.id, option.text) for option in
-            self.task_in_testing_session.task.multiplechoicetest.answer_set.all()
+            (option.id, option.text) for option in multiple_choice_test.answer_set.all()
         ]
         random.shuffle(self.fields["selected_answers"].choices)
 

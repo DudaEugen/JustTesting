@@ -1,7 +1,8 @@
 from django.http.response import HttpResponseRedirect
 from django.views.generic import CreateView, FormView
-from .models import *
 from django.shortcuts import get_object_or_404
+from .models import *
+from .forms import TestingSessionOfAutorizedUserForm, TestingSessionOfUnautorizedUserForm
 
 
 class TestingSessionCreateView(CreateView):
@@ -9,21 +10,14 @@ class TestingSessionCreateView(CreateView):
     success_url = "start"
 
     def get_form(self, form_class=None):
-        from django.forms import modelform_factory
-
         if self.request.user.is_authenticated:
-            form_factory = modelform_factory(
-                model=TestingSessionOfAutorizedUser,
-                fields=["test"],
-            )
+            if self.request.POST:
+                return TestingSessionOfAutorizedUserForm(self.request.POST)
+            return TestingSessionOfAutorizedUserForm()
         else:
-            form_factory = modelform_factory(
-                model=TestingSessionOfUnautorizedUser,
-                fields=["test", "information"],
-            )
-        if self.request.POST:
-            return form_factory(self.request.POST)
-        return form_factory()
+            if self.request.POST:
+                return TestingSessionOfUnautorizedUserForm(self.request.POST)
+            return TestingSessionOfUnautorizedUserForm()
 
     def form_valid(self, form) -> HttpResponseRedirect:
         test_session = form.save(commit=False)
@@ -33,7 +27,7 @@ class TestingSessionCreateView(CreateView):
         else:
             test_session.save(self.request.session)
         self.kwargs["session"] = test_session
-        return super().form_valid(form)
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self) -> str:
         return f"session={self.kwargs['session'].pk}"
@@ -52,7 +46,9 @@ class TestingView(FormView):
         )
         task = Task.objects.select_derivatives().get(pk=task_in_session.task.pk)
         for _, form_class in inspect.getmembers(sys.modules[f.__name__], inspect.isclass):
-            if form_class.Meta.model.task_model == task.__class__:
+            is_task_model_form = hasattr(form_class, "Meta") and hasattr(form_class.Meta, "model") and \
+                                 hasattr(form_class.Meta.model, "task_model")
+            if is_task_model_form and form_class.Meta.model.task_model == task.__class__:
                 if self.request.POST:
                     return form_class(task_in_session, self.request.POST)
                 return form_class(task_in_session)
