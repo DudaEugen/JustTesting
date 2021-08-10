@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'JustTesting/base.html' %}
 
 {% block title %}
     Вибір тесту
@@ -9,7 +9,7 @@
         <form method="post">
         {% csrf_token %}
             {{ form }}
-            <input type="submit" value="Почати" class="btn btn-primary">
+            <input type="submit" value="Відповісти" class="btn btn-primary">
         </form>
     </div>
 {% endblock %}

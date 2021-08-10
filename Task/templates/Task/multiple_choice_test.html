@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "JustTesting/base.html" %}
 
 {% block static_load %}
     {% load static %}
@@ -17,7 +17,7 @@
                 {% with queryset=form.fields.task_list.queryset%}
                 {% with label=form.task_list.label %}
                 {% with disabled_option_text=form.task_list.help_text %}
-                    {% include "forms/fields/select.html" %}
+                    {% include "JustTesting/forms/fields/select.html" %}
                 {% endwith %}
                 {% endwith %}
                 {% endwith %}
@@ -27,7 +27,7 @@
                 <p>{{ form.text.label }}:</p>
                 {% with textarea=form.text %}
                 {% with placeholder=form.text.help_text %}
-                    {% include "forms/fields/textarea.html" %}
+                    {% include "JustTesting/forms/fields/textarea.html" %}
                 {% endwith %}
                 {% endwith %}
             {% endwith %}
@@ -53,7 +53,7 @@
                         <tr data-inline-form="answer_set-">
                             <td class="small-col">
                                 {% if answer_form.DELETE and answer_form.id.value %}
-                                    {% include "forms/fields/input.html" with input=answer_form.DELETE %}
+                                    {% include "JustTesting/forms/fields/input.html" with input=answer_form.DELETE %}
                                 {% endif %}
                                 {% if not answer_form.id.value %}
                                     <span class="btn btn-danger delete-inline-form" 
@@ -62,20 +62,20 @@
                                         &ndash;
                                     </span>
                                 {% endif %}
-                                {% include "forms/fields/input.html" with input=answer_form.test %}
-                                {% include "forms/fields/input.html" with input=answer_form.id %}
+                                {% include "JustTesting/forms/fields/input.html" with input=answer_form.test %}
+                                {% include "JustTesting/forms/fields/input.html" with input=answer_form.id %}
                             </td>
                             <td>
                                 {% with textarea=answer_form.text %}
                                 {% with placeholder=answer_form.text.label %}
-                                    {% include "forms/fields/textarea.html" %}
+                                    {% include "JustTesting/forms/fields/textarea.html" %}
                                 {% endwith %}
                                 {% endwith %}
                             </td>
                             <td class="small-col">
                                 {% with input=answer_form.weight %}
                                 {% with required=False %}
-                                    {% include "forms/fields/input.html" %}
+                                    {% include "JustTesting/forms/fields/input.html" %}
                                 {% endwith %}
                                 {% endwith %} 
                             </td>

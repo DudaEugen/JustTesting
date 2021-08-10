@@ -5,7 +5,7 @@ from .models import *
 
 class MultipleChoiceTestCreateView(CreateView):
     form_class = MultipleChoiceTestWithAnswersForm
-    template_name = "multiple_choice_test_create.html"
+    template_name = "Task/multiple_choice_test_create.html"
 
     def get_success_url(self):
         return "create"
@@ -14,7 +14,7 @@ class MultipleChoiceTestCreateView(CreateView):
 class MultipleChoiceTestUpdateView(UpdateView):
     form_class = MultipleChoiceTestWithAnswersForm
     model = MultipleChoiceTest
-    template_name = "multiple_choice_test_update.html"
+    template_name = "Task/multiple_choice_test_update.html"
 
     def get_success_url(self):
         return f"update={self.kwargs['pk']}"

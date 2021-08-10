@@ -6,7 +6,7 @@ from .forms import TestingSessionOfAutorizedUserForm, TestingSessionOfUnautorize
 
 
 class TestingSessionCreateView(CreateView):
-    template_name = "test_session_create.html"
+    template_name = "Testing/test_session_create.html"
     success_url = "start"
 
     def get_form(self, form_class=None):
@@ -34,7 +34,7 @@ class TestingSessionCreateView(CreateView):
 
 
 class TestingView(FormView):
-    template_name = "testing.html"
+    template_name = "Testing/testing.html"
 
     def get_form(self, form_class=None):
         import sys
