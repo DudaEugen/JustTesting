@@ -26,6 +26,8 @@ class TestingSessionOfUnautorizedUserForm(forms.ModelForm):
 
 
 class MultipleChoiceTestSolutionForm(forms.ModelForm):
+    template_name: str = "Testing/forms/MultipleChoiceTestSolutionForm.html"
+
     def __init__(self, task_in_session: models.M2MTaskInTestingSession,  *args, **kwargs):
         import random
 
