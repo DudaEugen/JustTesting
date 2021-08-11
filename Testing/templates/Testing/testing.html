@@ -1,14 +1,15 @@
 {% extends 'JustTesting/base.html' %}
 
 {% block title %}
-    Вибір тесту
+    Тестування
 {% endblock %}
 
 {% block content %}
     <div class="form-wrapper">
         <form method="post">
         {% csrf_token %}
-            {% include form.template_name with form=form %}
+            {% block form %}
+            {% endblock %}
             <input type="submit" value="Відповісти" class="btn btn-primary">
         </form>
     </div>

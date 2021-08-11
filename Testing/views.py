@@ -34,8 +34,6 @@ class TestingSessionCreateView(CreateView):
 
 
 class TestingView(FormView):
-    template_name = "Testing/testing.html"
-
     def get_session(self):
         try:
             session = TestingSession.objects.select_derivatives().get(pk=self.kwargs["pk"])
@@ -63,12 +61,16 @@ class TestingView(FormView):
             is_task_model_form = hasattr(form_class, "Meta") and hasattr(form_class.Meta, "model") and \
                                  hasattr(form_class.Meta.model, "task_model")
             if is_task_model_form and form_class.Meta.model.task_model == task.__class__:
+                self.kwargs["form_class"] = form_class
                 if self.request.POST:
                     return form_class(task_in_session, self.request.POST)
                 return form_class(task_in_session)
         raise NotImplementedError(
             f"Not implemented ModelForm for class {task.__class__.__name__}"
         )
+
+    def get_template_names(self):
+        return [self.kwargs["form_class"].template_name]
 
     def get_success_url(self) -> str:
         return f"session={self.kwargs['pk']}"

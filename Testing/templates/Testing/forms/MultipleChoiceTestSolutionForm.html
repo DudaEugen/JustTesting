@@ -1,1 +1,26 @@
-{{ form }}
+{% extends 'Testing/testing.html' %}
+
+{% block static_load %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
+    <link rel="stylesheet" href="{% static 'Testing/css/multiple_choice_test.css' %}">
+{% endblock %}
+
+{% block form %}
+    <div>{{ form.fields.selected_answers.label }}</div>
+
+    <div class="answers" {% if form.selected_answers.errors %} style="border: 2px solid red; " {% endif %}>
+        {% for error in form.selected_answers.errors %}
+            <p class="error">{{ error }}</p>
+        {% endfor %}
+
+        {% for value, answer in form.fields.selected_answers.choices %}
+            <div class="answer" onclick="this.getElementsByTagName('input')[0].click()">
+                <input type="checkbox" name="{{ form.selected_answers.name }}" value="{{ value }}">
+                <label>
+                    {{ answer }}
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
