@@ -69,6 +69,12 @@ class TestingSession(models.Model):
             self.end = self.begin + \
                 timezone.timedelta(minutes=self.test.duration)
 
+    def is_correct_user(self, request) -> bool:
+        """
+        check user or session
+        """
+        raise NotImplementedError("This function must be implemented by derivative class")
+
 
 class M2MTaskInTestingSession(models.Model):
     """
@@ -156,6 +162,9 @@ class TestingSessionOfUnautorizedUser(TestingSession):
             # if user did not have time to finish testing on time.
             session.set_expiry(self.end + timezone.timedelta(hours=1))
 
+    def is_correct_user(self, request) -> bool:
+        return self.id == request.session.get("test_session_id")
+
 
 class TestingSessionOfAutorizedUser(TestingSession):
     user = models.ForeignKey(
@@ -173,6 +182,9 @@ class TestingSessionOfAutorizedUser(TestingSession):
     class Meta:
         verbose_name = "Сесія тестування авторизованого користувача"
         verbose_name_plural = "Сесії тестувань авторизованих користувачів"
+
+    def is_correct_user(self, request) -> bool:
+        return self.user == request.user
 
 
 def _create_task_set_for_test_session(sender, instance, created: bool, *args, **kwargs):

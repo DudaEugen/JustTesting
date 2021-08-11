@@ -36,16 +36,28 @@ class TestingSessionCreateView(CreateView):
 class TestingView(FormView):
     template_name = "Testing/testing.html"
 
+    def get_session(self):
+        try:
+            session = TestingSession.objects.select_derivatives().get(pk=self.kwargs["pk"])
+        except TestingSession.DoesNotExist:
+            raise Http404("Incorrect session pk")
+
+        if not session.is_correct_user(self.request):
+            raise Http404("Incorrect session pk")
+        return session
+
     def get_form(self, form_class=None):
         import sys
         import inspect
         from . import forms as f
 
+        session = self.get_session()
         task_in_session = M2MTaskInTestingSession.objects.filter(
-            session_id=self.kwargs["pk"], is_completed=False
+            session_id=session.id, is_completed=False
         ).first()
         if task_in_session is None:
             raise Http404("Incorrect session pk")
+
         task = Task.objects.select_derivatives().get(pk=task_in_session.task.pk)
         for _, form_class in inspect.getmembers(sys.modules[f.__name__], inspect.isclass):
             is_task_model_form = hasattr(form_class, "Meta") and hasattr(form_class.Meta, "model") and \
@@ -54,7 +66,6 @@ class TestingView(FormView):
                 if self.request.POST:
                     return form_class(task_in_session, self.request.POST)
                 return form_class(task_in_session)
-
         raise NotImplementedError(
             f"Not implemented ModelForm for class {task.__class__.__name__}"
         )
