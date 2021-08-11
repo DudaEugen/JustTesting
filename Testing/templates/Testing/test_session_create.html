@@ -1,5 +1,10 @@
 {% extends 'JustTesting/base.html' %}
 
+{% block static_load %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
+{% endblock %}
+
 {% block title %}
     Вибір тесту
 {% endblock %}
@@ -8,7 +13,25 @@
     <div class="form-wrapper">
         <form method="post">
         {% csrf_token %}
-            {{ form }}
+            {% with select=form.test %}
+            {% with queryset=form.fields.test.queryset %}
+            {% with disabled_option_text=form.fields.test.help_text %}
+                {% include "JustTesting/forms/fields/select.html" with required=True %}
+            {% endwith %}
+            {% endwith %}
+            {% endwith %}
+            <br>
+
+            {% if form.information %}
+                {% with input=form.information %}
+                {% with label="Користувач" %}
+                {% with placeholder=form.fields.information.help_text %}
+                    {% include "JustTesting/forms/fields/input.html" %}
+                {% endwith %}
+                {% endwith %}
+                {% endwith %}
+                <br>
+            {% endif %}
             <input type="submit" value="Почати" class="btn btn-primary">
         </form>
     </div>
