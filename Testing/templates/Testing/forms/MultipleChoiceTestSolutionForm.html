@@ -4,6 +4,7 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
     <link rel="stylesheet" href="{% static 'Testing/css/multiple_choice_test.css' %}">
+    <script src="{% static 'Testing/js/multiple_choice_test.js' %}"></script>
 {% endblock %}
 
 {% block form %}
@@ -15,8 +16,9 @@
         {% endfor %}
 
         {% for value, answer in form.fields.selected_answers.choices %}
-            <div class="answer" onclick="this.getElementsByTagName('input')[0].click()">
-                <input type="checkbox" name="{{ form.selected_answers.name }}" value="{{ value }}">
+            <div class="answer" onclick="answer_click(this)">
+                <input type="checkbox" name="{{ form.selected_answers.name }}" value="{{ value }}"
+                       style="display: none;">
                 <label>
                     {{ answer }}
                 </label>
