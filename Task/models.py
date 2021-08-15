@@ -4,6 +4,25 @@ from typing import List, Iterable
 from JustTesting.utils.query import InheritanceManager
 
 
+class KnowledgeField(models.Model):
+    name = models.CharField(
+        max_length=250,
+        unique=True,
+        null=False,
+        blank=False,
+        verbose_name="Найменування",
+        help_text="Найменування області знань",
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Область знань"
+        verbose_name_plural = "Області знань"
+        ordering = ['name']
+
+
 class TaskList(models.Model):
     """
     List of tasks. Tasks can be of defferent types.
@@ -11,6 +30,14 @@ class TaskList(models.Model):
     When creating a testing session, 
     tasks are randomly selected from the list of tasks.
     """
+    knowledge_field = models.ForeignKey(
+        KnowledgeField,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Область знань",
+        help_text="Оберіть область знань",
+    )
     name = models.CharField(
         max_length=250,
         unique=True,
@@ -21,12 +48,13 @@ class TaskList(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        prefix = f"({self.knowledge_field}) " if self.knowledge_field else ""
+        return prefix + self.name
 
     class Meta:
         verbose_name = "Список завдань"
         verbose_name_plural = "Списки завдань"
-        ordering = ['name']
+        ordering = ['knowledge_field__name', 'name']
 
 
 class Task(models.Model):

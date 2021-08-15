@@ -21,12 +21,32 @@ class TestInTaskListInline(admin.TabularInline):
     can_delete = False
 
 
+class TaskListInKnowledgeFieldInline(admin.TabularInline):
+    model = TaskList
+    extra = 0
+    verbose_name = "Список завдань"
+    verbose_name_plural = "Списки завдань"
+
+
+class KnowledgeFieldAdmin(admin.ModelAdmin):
+    list_display = (
+        "__str__",
+    )
+    search_fields = (
+        "name",
+    )
+    inlines = (
+        TaskListInKnowledgeFieldInline,
+    )
+
+
 class TaskListAdmin(admin.ModelAdmin):
     list_display = (
         "__str__",
     )
     search_fields = (
         "name",
+        "knowledge_field__name",
     )
     inlines = (
         TestInTaskListInline,
@@ -47,5 +67,6 @@ class MultipleChoiceTestAdmin(admin.ModelAdmin):
     )
 
 
+admin.site.register(KnowledgeField, KnowledgeFieldAdmin)
 admin.site.register(TaskList, TaskListAdmin)
 admin.site.register(MultipleChoiceTest, MultipleChoiceTestAdmin)
