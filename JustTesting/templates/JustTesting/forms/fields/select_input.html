@@ -11,7 +11,7 @@
        onchange="changeSelectedValue(this)">
 <datalist id="list_{% if prefix %}{{ prefix }}-{% endif %}{{ select.name }}">
     {% for choice in queryset %}
-        <option data-value="{{ choice.id }}">{{ choice.name }}</option>
+        <option data-value="{{ choice.id }}">{{ choice }}</option>
     {% endfor %}
 </datalist>
 

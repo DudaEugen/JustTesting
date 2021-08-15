@@ -4,6 +4,7 @@
     {% load static %}
     <script src="{% static 'JustTesting/js/inline_formset.js' %}"></script>
     <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
+    <script src="{% static 'JustTesting/js/select_input.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -16,8 +17,8 @@
                 {% with select=form.task_list %}
                 {% with queryset=form.fields.task_list.queryset%}
                 {% with label=form.task_list.label %}
-                {% with disabled_option_text=form.task_list.help_text %}
-                    {% include "JustTesting/forms/fields/select.html" %}
+                {% with placeholder=form.task_list.help_text %}
+                    {% include "JustTesting/forms/fields/select_input.html" %}
                 {% endwith %}
                 {% endwith %}
                 {% endwith %}

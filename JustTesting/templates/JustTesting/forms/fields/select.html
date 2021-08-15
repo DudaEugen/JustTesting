@@ -26,7 +26,7 @@
     {% for choice in queryset %}
         <option value="{{ choice.pk|stringformat:'s' }}"
             {% if select.value|stringformat:'s' == choice.pk|stringformat:'s' %} selected {% endif %}>
-            {{ choice.name }}
+            {{ choice }}
         </option>
     {% endfor %}
 </select>
