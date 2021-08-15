@@ -4,6 +4,7 @@
     {% load static %}
     <script src="{% static 'JustTesting/js/inline_formset.js' %}"></script>
     <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
+    <script src="{% static 'JustTesting/js/select_input.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -84,8 +85,8 @@
                                 <!-- select task list -->
                                 {% with select=task_list_form.task_list %}
                                 {% with queryset=task_list_form.fields.task_list.queryset %}
-                                {% with disabled_option_text="&mdash; &mdash; &mdash;" %}
-                                    {% include "JustTesting/forms/fields/select.html" with required=False %}
+                                {% with placeholder="&mdash; &mdash; &mdash;" %}
+                                    {% include "JustTesting/forms/fields/select_input.html" %}
                                 {% endwith %}
                                 {% endwith %}
                                 {% endwith %}

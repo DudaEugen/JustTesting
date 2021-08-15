@@ -3,6 +3,7 @@
 {% block static_load %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
+    <script src="{% static 'JustTesting/js/select_input.js' %}"></script>
 {% endblock %}
 
 {% block title %}
@@ -15,8 +16,8 @@
         {% csrf_token %}
             {% with select=form.test %}
             {% with queryset=form.fields.test.queryset %}
-            {% with disabled_option_text=form.fields.test.help_text %}
-                {% include "JustTesting/forms/fields/select.html" with required=True %}
+            {% with placeholder=form.fields.test.help_text %}
+                {% include "JustTesting/forms/fields/select_input.html" %}
             {% endwith %}
             {% endwith %}
             {% endwith %}
