@@ -51,4 +51,4 @@ class MultipleChoiceTestSolutionForm(forms.Form):
         solution.save()
         for answer in self.cleaned_data['selected_answers']:
             solution.selected_answers.add(MultipleChoiceTestAnswer.objects.get(id=answer))
-        solution.save_result()
+        solution.compute_and_save_result_if_not_exist()

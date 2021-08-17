@@ -6,6 +6,7 @@ from Task.models import Task, MultipleChoiceTestAnswer, MultipleChoiceTest
 from django.db.models.signals import post_save
 from JustTesting.utils.query import InheritanceManager
 from django.contrib.sessions.backends.base import SessionBase
+from typing import Optional
 
 
 class TestingSession(models.Model):
@@ -73,8 +74,37 @@ class TestingSession(models.Model):
         """
         check user or session
         """
-        raise NotImplementedError(
-            "This function must be implemented by derivative class")
+        raise NotImplementedError("This function must be implemented by derivative class")
+
+    def compute_and_save_result_if_not_exist(self, force_recalculate: bool = False) -> float:
+        if force_recalculate or self.result is None:
+            self.result = self._calculate_result()
+            self.save()
+        return self.result
+
+    def _calculate_result(self, force_recalculate: bool = False) -> float:
+        if force_recalculate or self.result is None:
+            tasks_in_session = {task.id for task in M2MTaskInTestingSession.objects.filter(session_id=self.id)}
+            solutions = Solution.objects.select_derivatives().filter(task_in_testing_session__session=self)
+            count_correct_tasks = len(tasks_in_session)
+            result: Optional[float] = None
+            for solution in solutions:
+                task_result = solution.compute_and_save_result_if_not_exist(force_recalculate)
+                if task_result is None:  # solution can't be graded if result is None (task were deleted or etc)
+                    count_correct_tasks -= 1
+                else:
+                    if result is None:
+                        result = task_result
+                    else:
+                        result += task_result
+                tasks_in_session.remove(solution.task_in_testing_session.id)
+            if tasks_in_session:
+                raise RuntimeError("TestingSession have unresolved tasks")
+            if result is None:
+                raise AttributeError("TestingSession can't be graded")
+            return result / count_correct_tasks
+        else:
+            return self.result
 
 
 class M2MTaskInTestingSession(models.Model):
@@ -116,7 +146,7 @@ class M2MTaskInTestingSession(models.Model):
         null=False,
         blank=True,
         default=0,
-        verbose_name="Розташування завдання",
+        verbose_name="Порядок видачі завдання",
         help_text="Чим більше значення, тим пізніше це завдання буде знаходитись у списку завдань сесії",
     )
     issue_datetime = models.DateTimeField(
@@ -265,6 +295,18 @@ class Solution(models.Model):
         self.task_in_testing_session.save()
         super().save()
 
+    def compute_and_save_result_if_not_exist(self, force_recalculate: bool = False) -> float:
+        if force_recalculate or self.result is None:
+            self.result = self._calculate_result()
+            self.save()
+        return self.result
+
+    def _calculate_result(self, force_recalculate: bool = False) -> Optional[float]:
+        """
+        return None if can't be graded (task were deleted or etc)
+        """
+        raise NotImplementedError("This function must be implemented by derivative class")
+
 
 class MultipleChoiceTestSolution(Solution):
     """
@@ -276,25 +318,51 @@ class MultipleChoiceTestSolution(Solution):
     task_form = MultipleChoiceTestSolutionForm
     selected_answers = models.ManyToManyField(
         MultipleChoiceTestAnswer,
+        through="M2MSelectedAnswersInMultipleChoiceTestSolution",
         verbose_name="Відповіді",
         help_text="Обрані варіанти відповідей",
     )
 
-    def save_result(self):
-        self.result = self._calculate_result()
-        self.save()
+    def _calculate_result(self, force_recalculate: bool = False) -> Optional[float]:
+        if force_recalculate or self.result is None:
+            selected_options_weight = 0
+            for option in self.selected_answer_set.all():
+                if option.selected_answer is None:
+                    return None
+                if option.selected_answer.weight == 0:
+                    return 0
+                selected_options_weight += option.selected_answer.weight
+
+            sum_weight = 0
+            for option in self.task_in_testing_session.task.multiplechoicetest.answer_set.all():
+                sum_weight += option.weight
+            if sum_weight > 0:
+                return 100 * selected_options_weight/sum_weight
+            return None
+
         return self.result
 
-    def _calculate_result(self) -> float:
-        selected_options_weight = 0
-        for option in self.selected_answers.all():
-            if option.weight == 0:
-                return 0
-            selected_options_weight += option.weight
 
-        sum_weight = 0
-        for option in self.task_in_testing_session.task.multiplechoicetest.answer_set.all():
-            sum_weight += option.weight
+class M2MSelectedAnswersInMultipleChoiceTestSolution(models.Model):
+    selected_answer = models.ForeignKey(
+        MultipleChoiceTestAnswer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=False,
+        related_name="solution_set",
+        verbose_name="Варіант відповіді",
+        help_text="Обраний варіант відповіді",
+    )
+    solution = models.ForeignKey(
+        MultipleChoiceTestSolution,
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
+        related_name="selected_answer_set",
+        verbose_name="Розв'язок",
+        help_text="Розв'язок завдання",
+    )
 
-        if sum_weight > 0:
-            return 100 * selected_options_weight/sum_weight
+    class Meta:
+        verbose_name = "Обраний варіант відповіді у розв'язку питання з вибором кількох варіантів"
+        verbose_name_plural = "Обрані варіанти відповіді у розв'язку питання з вибором кількох варіантів"
