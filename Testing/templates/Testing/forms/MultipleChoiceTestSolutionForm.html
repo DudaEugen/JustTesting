@@ -12,11 +12,10 @@
     {% csrf_token %}
     <div>{{ form.fields.selected_answers.label }}</div>
 
-    <div class="answers {% if form.selected_answers.errors %} error {% endif %}">
+    <div class="answers {% if form.selected_answers.errors %} error_answers {% endif %}">
         {% for error in form.selected_answers.errors %}
             <p class="error">{{ error }}</p>
         {% endfor %}
-
         {% for value, answer in form.fields.selected_answers.choices %}
             <div class="answer" onclick="answer_click(this)">
                 <input type="checkbox" name="{{ form.selected_answers.name }}" value="{{ value }}"
