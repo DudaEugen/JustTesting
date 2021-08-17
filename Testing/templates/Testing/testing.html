@@ -6,11 +6,7 @@
 
 {% block content %}
     <div class="form-wrapper">
-        <form method="post">
-        {% csrf_token %}
-            {% block form %}
-            {% endblock %}
-            <input type="submit" value="Відповісти" class="btn btn-primary">
-        </form>
+        {% block form %}
+        {% endblock %}
     </div>
 {% endblock %}

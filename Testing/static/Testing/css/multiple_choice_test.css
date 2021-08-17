@@ -6,7 +6,8 @@
 
 .answer {
     padding-top: 10px;
-    padding-left: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
     margin-top: 5px;
     margin-bottom: 5px;
     border-radius: 15px;
@@ -17,6 +18,6 @@
     background-color: chartreuse;
 }
 
-label {
-    margin-left: 10px;
+.error_answers {
+    border: 2px solid red;
 }
