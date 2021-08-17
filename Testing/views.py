@@ -1,5 +1,6 @@
 from django.http.response import HttpResponseRedirect
-from django.views.generic import CreateView, FormView
+from django.urls import reverse
+from django.views.generic import CreateView, FormView, DetailView
 from django.http import Http404
 from .models import *
 from .forms import TestingSessionOfAutorizedUserForm, TestingSessionOfUnautorizedUserForm
@@ -46,14 +47,17 @@ class TestingView(FormView):
             raise Http404("Incorrect session pk")
         return session
 
-    def get_form(self, form_class=None):
+    def dispatch(self, request, *args, **kwargs):
         self.kwargs["session"] = self.get_session()
-        task_in_session = M2MTaskInTestingSession.objects.filter(
+        self.kwargs["task_in_session"] = M2MTaskInTestingSession.objects.filter(
             session_id=self.kwargs["session"].id, is_completed=False
         ).first()
-        if task_in_session is None:
-            raise Http404("Incorrect session pk")
+        if self.kwargs["task_in_session"] is None:
+            return HttpResponseRedirect(reverse('testing result', kwargs={'pk': self.kwargs["pk"]}))
+        return super().dispatch(request, *args, **kwargs)
 
+    def get_form(self, form_class=None):
+        task_in_session = self.kwargs["task_in_session"]
         self.kwargs["task"] = Task.objects.select_derivatives().get(pk=task_in_session.task.pk)
         self.kwargs["form_class"] = self.get_form_class()
         form_class = self.kwargs["form_class"]
@@ -83,3 +87,28 @@ class TestingView(FormView):
 
     def get_success_url(self) -> str:
         return f"session={self.kwargs['pk']}"
+
+
+class TestingResultView(DetailView):
+    template_name = "Testing/result.html"
+
+    def get_session(self):
+        try:
+            session = TestingSession.objects.select_derivatives().get(pk=self.kwargs["pk"])
+        except TestingSession.DoesNotExist:
+            raise Http404("Incorrect session pk")
+
+        if not session.is_correct_user(self.request):
+            raise Http404("Incorrect session pk")
+        return session
+
+    def dispatch(self, request, *args, **kwargs):
+        self.kwargs["session"] = self.get_session()
+        try:
+            self.kwargs["session"].compute_and_save_result_if_not_exist()
+        except RuntimeError:
+            return HttpResponseRedirect(reverse('testing', kwargs={'pk': self.kwargs["pk"]}))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.kwargs["session"]
