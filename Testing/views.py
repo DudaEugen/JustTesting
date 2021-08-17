@@ -3,6 +3,7 @@ from django.views.generic import CreateView, FormView
 from django.http import Http404
 from .models import *
 from .forms import TestingSessionOfAutorizedUserForm, TestingSessionOfUnautorizedUserForm
+from django.utils import timezone
 
 
 class TestingSessionCreateView(CreateView):
@@ -36,7 +37,8 @@ class TestingSessionCreateView(CreateView):
 class TestingView(FormView):
     def get_session(self):
         try:
-            session = TestingSession.objects.select_derivatives().get(pk=self.kwargs["pk"])
+            session = TestingSession.objects.select_derivatives().get(
+                pk=self.kwargs["pk"])
         except TestingSession.DoesNotExist:
             raise Http404("Incorrect session pk")
 
@@ -45,28 +47,35 @@ class TestingView(FormView):
         return session
 
     def get_form(self, form_class=None):
-        import sys
-        import inspect
-        from . import forms as f
-
-        session = self.get_session()
+        self.kwargs["session"] = self.get_session()
         task_in_session = M2MTaskInTestingSession.objects.filter(
-            session_id=session.id, is_completed=False
+            session_id=self.kwargs["session"].id, is_completed=False
         ).first()
         if task_in_session is None:
             raise Http404("Incorrect session pk")
 
-        task = Task.objects.select_derivatives().get(pk=task_in_session.task.pk)
-        for _, form_class in inspect.getmembers(sys.modules[f.__name__], inspect.isclass):
-            is_task_model_form = hasattr(form_class, "Meta") and hasattr(form_class.Meta, "model") and \
-                                 hasattr(form_class.Meta.model, "task_model")
-            if is_task_model_form and form_class.Meta.model.task_model == task.__class__:
-                self.kwargs["form_class"] = form_class
-                if self.request.POST:
-                    return form_class(task_in_session, self.request.POST)
-                return form_class(task_in_session)
+        self.kwargs["task"] = Task.objects.select_derivatives().get(pk=task_in_session.task.pk)
+        self.kwargs["form_class"] = self.get_form_class()
+        form_class = self.kwargs["form_class"]
+
+        if not task_in_session.issue_datetime:
+            task_in_session.issue_datetime = timezone.now()
+            task_in_session.save()
+        if self.request.POST:
+            return form_class(task_in_session, self.request.POST)
+        return form_class(task_in_session)
+
+    def form_valid(self, form):
+        form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_form_class(self):
+        task = self.kwargs["task"]
+        for solution_class in Solution.__subclasses__():
+            if solution_class.task_model == task.__class__:
+                return solution_class.task_form
         raise NotImplementedError(
-            f"Not implemented ModelForm for class {task.__class__.__name__}"
+            f"Not implemented Form for class {task.__class__.__name__}"
         )
 
     def get_template_names(self):

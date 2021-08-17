@@ -2,7 +2,7 @@ from django import forms
 from django.forms import widgets
 from . import models
 from Test.models import Test
-from Task.models import MultipleChoiceTest
+from Task.models import MultipleChoiceTest, MultipleChoiceTestAnswer
 
 
 class TestingSessionOfAutorizedUserForm(forms.ModelForm):
@@ -18,15 +18,20 @@ class TestingSessionOfAutorizedUserForm(forms.ModelForm):
 class TestingSessionOfUnautorizedUserForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["test"].queryset = Test.objects.filter(is_allowed=True, is_allow_for_unautorized_users=True)
+        self.fields["test"].queryset = Test.objects.filter(
+            is_allowed=True, is_allow_for_unautorized_users=True)
 
     class Meta:
         model = models.TestingSessionOfUnautorizedUser
         fields = ["test", "information"]
 
 
-class MultipleChoiceTestSolutionForm(forms.ModelForm):
+class MultipleChoiceTestSolutionForm(forms.Form):
     template_name: str = "Testing/forms/MultipleChoiceTestSolutionForm.html"
+
+    selected_answers = forms.MultipleChoiceField(
+        widget=widgets.CheckboxSelectMultiple,
+    )
 
     def __init__(self, task_in_session: models.M2MTaskInTestingSession,  *args, **kwargs):
         import random
@@ -40,12 +45,10 @@ class MultipleChoiceTestSolutionForm(forms.ModelForm):
         ]
         random.shuffle(self.fields["selected_answers"].choices)
 
-    def save(self, commit: bool = True):
-        solution = super().save(False)
+    def save(self):
+        solution = models.MultipleChoiceTestSolution()
         solution.task_in_testing_session = self.task_in_testing_session
-        solution.save(commit)
-
-    class Meta:
-        model = models.MultipleChoiceTestSolution
-        fields = ("selected_answers",)
-        widgets = {"selected_answers": widgets.CheckboxSelectMultiple}
+        solution.save()
+        for answer in self.cleaned_data['selected_answers']:
+            solution.selected_answers.add(MultipleChoiceTestAnswer.objects.get(id=answer))
+        solution.save_result()

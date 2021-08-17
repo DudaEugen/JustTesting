@@ -73,7 +73,8 @@ class TestingSession(models.Model):
         """
         check user or session
         """
-        raise NotImplementedError("This function must be implemented by derivative class")
+        raise NotImplementedError(
+            "This function must be implemented by derivative class")
 
 
 class M2MTaskInTestingSession(models.Model):
@@ -234,6 +235,8 @@ class Solution(models.Model):
         datetime: Date and time of solution create.
         result: Result of solution in percents.
     """
+    task_model = None
+    task_form = None
     task_in_testing_session = models.OneToOneField(
         M2MTaskInTestingSession,
         on_delete=models.CASCADE,
@@ -257,22 +260,30 @@ class Solution(models.Model):
     )
     objects = InheritanceManager()
 
+    def save(self):
+        self.task_in_testing_session.is_completed = True
+        self.task_in_testing_session.save()
+        super().save()
+
 
 class MultipleChoiceTestSolution(Solution):
     """
     Solution of MultipleChoiceTest.
     """
+    from .forms import MultipleChoiceTestSolutionForm
+
     task_model = MultipleChoiceTest
+    task_form = MultipleChoiceTestSolutionForm
     selected_answers = models.ManyToManyField(
         MultipleChoiceTestAnswer,
         verbose_name="Відповіді",
         help_text="Обрані варіанти відповідей",
     )
 
-    def save(self, commit: bool = True):
-        if commit:
-            self.result = self._calculate_result()
-        super().save(commit)
+    def save_result(self):
+        self.result = self._calculate_result()
+        self.save()
+        return self.result
 
     def _calculate_result(self) -> float:
         selected_options_weight = 0
