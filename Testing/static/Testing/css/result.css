@@ -1,0 +1,20 @@
+.user__checkmark {
+    color: green;
+    font-weight: bold;
+    padding-right: 5px;
+    padding-left: 5px;
+    border: 1px solid green;
+    margin-left: 5px;
+    border-radius: 35px;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 20px 15px;
+}
+
+.row_name {
+    font-weight: bold;
+    text-align: right;
+}
