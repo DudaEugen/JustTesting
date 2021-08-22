@@ -102,8 +102,10 @@ class TestingSession(models.Model):
                 tasks_in_session.remove(solution.task_in_testing_session.id)
             if tasks_in_session and not force_recalculate:
                 raise RuntimeError("TestingSession have unresolved tasks")
-            if result is None:
+            if count_correct_tasks == 0:
                 raise AttributeError("TestingSession can't be graded")
+            if result is None:
+                result = 0
             return result / count_correct_tasks
         else:
             return self.result
