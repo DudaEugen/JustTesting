@@ -3,12 +3,20 @@ from django.forms import widgets
 from . import models
 from Test.models import Test
 from Task.models import MultipleChoiceTest, MultipleChoiceTestAnswer
+from typing import Dict, Any
 
 
 class TestingSessionOfAutorizedUserForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, active_user_sessions, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["test"].queryset = Test.objects.filter(is_allowed=True)
+        self.active_user_sessions = active_user_sessions
+    
+    def clean_test(self):
+        if self.cleaned_data["test"].id in {session.test.id for session in self.active_user_sessions}:
+            self.add_error(field="test", error="Ви ще не завершили таке тестування, що було розпочато раніше")
+            return
+        return self.cleaned_data["test"]
 
     class Meta:
         model = models.TestingSessionOfAutorizedUser
@@ -16,10 +24,17 @@ class TestingSessionOfAutorizedUserForm(forms.ModelForm):
 
 
 class TestingSessionOfUnautorizedUserForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, active_user_sessions, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["test"].queryset = Test.objects.filter(
             is_allowed=True, is_allow_for_unautorized_users=True)
+        self.active_user_sessions = active_user_sessions
+    
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data = super().clean()
+        if len(self.active_user_sessions) > 0:
+            self.add_error(field=None, error="Ви маєте незавершенні тестування")
+        return cleaned_data
 
     class Meta:
         model = models.TestingSessionOfUnautorizedUser

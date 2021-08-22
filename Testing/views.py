@@ -21,15 +21,12 @@ class TestingSessionCreateView(CreateView):
 
         if self.request.user.is_authenticated:
             if self.request.POST:
-                return TestingSessionOfAutorizedUserForm(self.request.POST)
-            return TestingSessionOfAutorizedUserForm()
+                return TestingSessionOfAutorizedUserForm(self.kwargs["active_sessions"], self.request.POST)
+            return TestingSessionOfAutorizedUserForm(self.kwargs["active_sessions"])
         else:
             if self.request.POST:
-                form = TestingSessionOfUnautorizedUserForm(self.request.POST)
-                if self.kwargs["active_sessions_count"] > 0:
-                    form.add_error(field=None, error="Ви маєте незавершенні тестування")
-                return form
-            return TestingSessionOfUnautorizedUserForm()
+                return TestingSessionOfUnautorizedUserForm(self.kwargs["active_sessions"], self.request.POST)
+            return TestingSessionOfUnautorizedUserForm(self.kwargs["active_sessions"])
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
