@@ -15,7 +15,7 @@
 
 <body>
     <nav class="navbar navbar-dark bg-primary justify-content-between">
-        <a class="navbar-brand text-light">Just Testing</a>
+        <a class="navbar-brand text-light">{% if navbar_brand %} {{ navbar_brand }} {% endif %}</a>
         {% block auth_link %}
             {% if request.user.is_authenticated %}
                 <a href="{% url 'logout' %}" class="btn btn-danger btn-lg text-light">
