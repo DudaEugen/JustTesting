@@ -79,7 +79,7 @@ class TestingSession(models.Model):
 
     def compute_and_save_result_if_not_exist(self, force_recalculate: bool = False) -> float:
         if force_recalculate or self.result is None:
-            self.result = self._calculate_result()
+            self.result = self._calculate_result(force_recalculate)
             self.save()
         return self.result
 
@@ -100,7 +100,7 @@ class TestingSession(models.Model):
                     else:
                         result += task_result
                 tasks_in_session.remove(solution.task_in_testing_session.id)
-            if tasks_in_session:
+            if tasks_in_session and not force_recalculate:
                 raise RuntimeError("TestingSession have unresolved tasks")
             if result is None:
                 raise AttributeError("TestingSession can't be graded")
@@ -209,7 +209,10 @@ class TestingSessionOfUnautorizedUser(TestingSession):
     def get_active_sessions(cls, request):
         session_id = request.session.get("test_session_id")
         if session_id:
-            return cls.objects.filter(id=session_id, result__isnull=True)
+            now = timezone.now()
+            return cls.objects.filter(
+                id=session_id, result__isnull=True, begin__lte=now, end__gte=now
+            )
         return cls.objects.none()
 
 
@@ -235,7 +238,10 @@ class TestingSessionOfAutorizedUser(TestingSession):
 
     @classmethod
     def get_active_sessions(cls, request):
-        return cls.objects.filter(user=request.user, result__isnull=True)
+        now = timezone.now()
+        return cls.objects.filter(
+            user=request.user, result__isnull=True, begin__lte=now, end__gte=now
+        )
 
 
 def _create_task_set_for_test_session(sender, instance, created: bool, *args, **kwargs):

@@ -30,7 +30,6 @@ class TestingSessionCreateView(CreateView):
                     form.add_error(field=None, error="Ви маєте незавершенні тестування")
                 return form
             return TestingSessionOfUnautorizedUserForm()
-        
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -67,6 +66,8 @@ class TestingView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.kwargs["session"] = self.get_session()
+        if self.kwargs["session"].end < timezone.now():
+            return HttpResponseRedirect(reverse('testing result', kwargs={'pk': self.kwargs["pk"]}))
         self.kwargs["task_in_session"] = M2MTaskInTestingSession.objects.filter(
             session_id=self.kwargs["session"].id, is_completed=False
         ).first()
@@ -125,9 +126,14 @@ class TestingResultView(DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.kwargs["session"] = self.get_session()
         try:
-            self.kwargs["session"].compute_and_save_result_if_not_exist()
+            self.kwargs["session"].compute_and_save_result_if_not_exist(
+                force_recalculate=self.kwargs["session"].result is None and\
+                                  self.kwargs["session"].end < timezone.now()
+            )
         except RuntimeError:
-            return HttpResponseRedirect(reverse('testing', kwargs={'pk': self.kwargs["pk"]}))
+            if self.kwargs["session"].end > timezone.now():
+                return HttpResponseRedirect(reverse('testing', kwargs={'pk': self.kwargs["pk"]}))
+            return HttpResponseRedirect(reverse('create testing session'))
         return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
@@ -145,4 +151,4 @@ class ActiveTestingSessions(ListView):
         return super().dispatch(request, *args, **kwargs)
     
     def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user, result__isnull=True)
+        return TestingSessionOfAutorizedUser.get_active_sessions(self.request)
