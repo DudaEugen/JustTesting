@@ -33,7 +33,22 @@
                 {% endwith %}
                 <br>
             {% endif %}
+
+            {% for error in form.non_field_errors %}
+                <p class="error">{{ error }}</p>
+            {% endfor %}
+
             <input type="submit" value="Почати" class="btn btn-primary">
         </form>
     </div>
+    <br>
+    {% if active_sessions_count > 0 %}
+        <a href=
+            {% if active_sessions_count == 1 %}
+                "{% url 'testing' pk=session_id %}"
+            {% else %}
+                "{% url 'active testing sessions' %}"
+            {% endif %}
+        class="btn btn-success">Продовжити тестування</a>
+    {% endif %}
 {% endblock %}

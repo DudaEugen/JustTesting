@@ -74,7 +74,8 @@ class TestingSession(models.Model):
         """
         check user or session
         """
-        raise NotImplementedError("This function must be implemented by derivative class")
+        raise NotImplementedError(
+            "This function must be implemented by derivative class")
 
     def compute_and_save_result_if_not_exist(self, force_recalculate: bool = False) -> float:
         if force_recalculate or self.result is None:
@@ -90,7 +91,8 @@ class TestingSession(models.Model):
             result: Optional[float] = None
             for solution in solutions:
                 task_result = solution.compute_and_save_result_if_not_exist(force_recalculate)
-                if task_result is None:  # solution can't be graded if result is None (task were deleted or etc)
+                # solution can't be graded if result is None (task were deleted or etc)
+                if task_result is None:
                     count_correct_tasks -= 1
                 else:
                     if result is None:
@@ -105,6 +107,12 @@ class TestingSession(models.Model):
             return result / count_correct_tasks
         else:
             return self.result
+
+    @classmethod
+    def get_active_sessions(cls, request):
+        if request.user.is_authenticated:
+            return TestingSessionOfAutorizedUser.get_active_sessions(request)
+        return TestingSessionOfUnautorizedUser.get_active_sessions(request)
 
 
 class M2MTaskInTestingSession(models.Model):
@@ -185,16 +193,24 @@ class TestingSessionOfUnautorizedUser(TestingSession):
         verbose_name = "Сесія тестування неавторизованого користувача"
         verbose_name_plural = "Сесії тестувань неавторизованих користувачів"
 
-    def save(self, session: SessionBase):
+    def save(self, session: Optional[SessionBase] = None):
         super().save()
-        session["test_session_id"] = self.id
-        if session.get_expiry_date() < self.end:
-            # 1 hours after end it is time for take result of testing
-            # if user did not have time to finish testing on time.
-            session.set_expiry(self.end + timezone.timedelta(hours=1))
+        if session:
+            session["test_session_id"] = self.id
+            if session.get_expiry_date() < self.end:
+                # 1 hours after end it is time for take result of testing
+                # if user did not have time to finish testing on time.
+                session.set_expiry(self.end + timezone.timedelta(hours=1))
 
     def is_correct_user(self, request) -> bool:
         return self.id == request.session.get("test_session_id")
+
+    @classmethod
+    def get_active_sessions(cls, request):
+        session_id = request.session.get("test_session_id")
+        if session_id:
+            return cls.objects.filter(id=session_id, result__isnull=True)
+        return cls.objects.none()
 
 
 class TestingSessionOfAutorizedUser(TestingSession):
@@ -216,6 +232,10 @@ class TestingSessionOfAutorizedUser(TestingSession):
 
     def is_correct_user(self, request) -> bool:
         return self.user == request.user
+
+    @classmethod
+    def get_active_sessions(cls, request):
+        return cls.objects.filter(user=request.user, result__isnull=True)
 
 
 def _create_task_set_for_test_session(sender, instance, created: bool, *args, **kwargs):
@@ -305,7 +325,8 @@ class Solution(models.Model):
         """
         return None if can't be graded (task were deleted or etc)
         """
-        raise NotImplementedError("This function must be implemented by derivative class")
+        raise NotImplementedError(
+            "This function must be implemented by derivative class")
 
 
 class MultipleChoiceTestSolution(Solution):

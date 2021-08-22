@@ -1,0 +1,18 @@
+{% extends 'JustTesting/base.html' %}
+
+{% block title %}
+    Незавершені сесії тестування
+{% endblock %}
+
+{% block content %}
+    {% for session in sessions %}
+        <div>
+            <p><a href="{% url 'testing' pk=session.id %}" class="btn btn-success">
+                {{ session.test }}
+            </a></p>
+            <p>Розпочато: {{ session.begin|date:"d.m.y H:i" }}</p>
+            <p>Завершення: {{ session.end|date:"d.m.y H:i" }}</p>
+        </div>
+        <hr>
+    {% endfor %}
+{% endblock %}
