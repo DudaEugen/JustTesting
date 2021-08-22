@@ -1,8 +1,11 @@
 from django.views.generic import CreateView, UpdateView
 from .forms import TestWithTaskListForm
 from .models import *
+from django.utils.decorators import method_decorator
+from JustTesting.utils.permission_decorators import user_permissions_decorator
 
 
+@method_decorator(user_permissions_decorator, name="dispatch")
 class TestCreateView(CreateView):
     form_class = TestWithTaskListForm
     template_name = "Test/test_create.html"
@@ -11,6 +14,7 @@ class TestCreateView(CreateView):
         return "create"
 
 
+@method_decorator(user_permissions_decorator, name="dispatch")
 class TestUpdateView(UpdateView):
     form_class = TestWithTaskListForm
     model = Test
