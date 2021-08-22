@@ -15,7 +15,7 @@ class InheritanceQyerySetWrapper:
 
     def __init__(self, queryset: Optional[QuerySet] = None,
                  model=None, query=None, using=None, hints=None):
-        self._index: int = 0
+        self._iter = None
         self._query_set = queryset if queryset is not None else\
             QuerySet(model, query, using, hints)
         if not self._query_set.query.select_related:
@@ -50,16 +50,11 @@ class InheritanceQyerySetWrapper:
         return InheritanceQyerySetWrapper(self._query_set.order_by(*field_names))
 
     def __iter__(self):
-        self._index = 0
+        self._iter = iter(self._query_set)
         return self
 
     def __next__(self):
-        try:
-            next = self._cast_to_derivative(self._query_set[self._index])
-            self._index += 1
-            return next
-        except IndexError:
-            raise StopIteration()
+        return self._cast_to_derivative(next(self._iter))
 
     def __getitem__(self, k):
         return self._cast_to_derivative(self._query_set[k])
