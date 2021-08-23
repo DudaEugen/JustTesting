@@ -1,0 +1,18 @@
+.testing_header {
+    text-align: center;
+    font-size: large;
+    padding-bottom: 15px;
+}
+
+.testing_name {
+    font-weight: 600;
+}
+
+.testing_info {
+    font-size: small;
+}
+
+.testing_time_warninig {
+    color: red;
+    font-weight: bold;
+}

@@ -4,7 +4,27 @@
     Тестування
 {% endblock %}
 
+{% block static_load %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Testing/css/testing.css' %}">
+    <script src="{% static 'Testing/js/testing.js' %}"></script>
+
+    {% block form_static_load %}
+    {% endblock %}
+{% endblock %}
+
 {% block content %}
+    <div class="testing_header">
+        <div class="testing_name">{{ session.test.name }}</div>
+        <div class="testing_info">
+            Залишилось питань: {{ number_of_task_left }}
+        </div>
+        <div class="testing_info">
+            Тестування завершиться через: 
+            <span id="testing_time" data-end="{{ session.end|date:"r" }}"
+                  data-timeout-url="{% url 'testing result' pk=session.id %}"></span>
+        </div>
+    </div>
     <div class="form-wrapper">
         {% block form %}
         {% endblock %}

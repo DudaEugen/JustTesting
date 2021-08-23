@@ -86,6 +86,12 @@ class TestingView(FormView):
             return form_class(task_in_session, self.request.POST)
         return form_class(task_in_session)
 
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["session"] = self.kwargs["session"]
+        context["number_of_task_left"] = context["session"].task_set.filter(is_completed=False).count()
+        return context
+
     def form_valid(self, form):
         form.save()
         return HttpResponseRedirect(self.get_success_url())
