@@ -5,9 +5,13 @@
     <script src="{% static 'JustTesting/js/inline_formset.js' %}"></script>
     <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
     <script src="{% static 'JustTesting/js/select_input.js' %}"></script>
+    {% block non_form_static_load %}
+    {% endblock %}
 {% endblock %}
 
 {% block content %}
+    {% block content_header %}
+    {% endblock %}
     <div class="form-wrapper">
         <form method="post">
         {% csrf_token %}

@@ -12,6 +12,10 @@ class TestingSessionCreateView(CreateView):
     template_name = "Testing/test_session_create.html"
     success_url = "start"
 
+    def get_initial(self) -> Dict[str, Any]:
+        initial_test = self.kwargs.get("test_pk")
+        return {} if initial_test is None else {"test": initial_test}
+
     def get_active_sessions(self):
         return TestingSession.get_active_sessions(self.request)
 
@@ -21,12 +25,16 @@ class TestingSessionCreateView(CreateView):
 
         if self.request.user.is_authenticated:
             if self.request.POST:
-                return TestingSessionOfAutorizedUserForm(self.kwargs["active_sessions"], self.request.POST)
-            return TestingSessionOfAutorizedUserForm(self.kwargs["active_sessions"])
+                return TestingSessionOfAutorizedUserForm(self.kwargs["active_sessions"], self.request.POST,
+                        initial=self.get_initial())
+            return TestingSessionOfAutorizedUserForm(self.kwargs["active_sessions"], 
+                    initial=self.get_initial())
         else:
             if self.request.POST:
-                return TestingSessionOfUnautorizedUserForm(self.kwargs["active_sessions"], self.request.POST)
-            return TestingSessionOfUnautorizedUserForm(self.kwargs["active_sessions"])
+                return TestingSessionOfUnautorizedUserForm(self.kwargs["active_sessions"], self.request.POST,
+                        initial=self.get_initial())
+            return TestingSessionOfUnautorizedUserForm(self.kwargs["active_sessions"], 
+                    initial=self.get_initial())
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)

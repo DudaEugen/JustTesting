@@ -3,6 +3,7 @@ from .forms import TestWithTaskListForm
 from .models import *
 from django.utils.decorators import method_decorator
 from JustTesting.utils.permission_decorators import user_permissions_decorator
+from typing import Dict, Any
 
 
 @method_decorator(user_permissions_decorator, name="dispatch")

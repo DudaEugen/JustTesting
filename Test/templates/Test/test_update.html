@@ -4,6 +4,19 @@
     Корегувати тест
 {% endblock %}
 
+{% block non_form_static_load %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Test/css/test_update.css' %}">
+{% endblock %}
+
+{% block content_header %}
+    <div class="test_link_container">
+        <a href="{% url 'create testing session' test_pk=object.id %}">
+            Посилання на тест "{{ object.name }}"
+        </a>
+    </div>
+{% endblock %}
+
 {% block submit_button %}
     <input type="submit" value="Зберегти" class="btn btn-primary">
 {% endblock %}
