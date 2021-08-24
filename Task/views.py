@@ -1,8 +1,15 @@
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
 from .forms import MultipleChoiceTestWithAnswersForm
 from .models import *
 from django.utils.decorators import method_decorator
 from JustTesting.utils.permission_decorators import user_permissions_decorator
+
+
+@method_decorator(user_permissions_decorator, name="dispatch")
+class TaskListView(ListView):
+    model = TaskList
+    template_name = "Task/task_lists.html"
+    context_object_name = "task_lists"
 
 
 @method_decorator(user_permissions_decorator, name="dispatch")

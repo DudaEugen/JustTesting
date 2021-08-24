@@ -1,0 +1,16 @@
+{% extends "JustTesting/base.html" %}
+
+{% block title %}
+    Перелік тестів
+{% endblock %}
+
+{% block content %}
+    <div style="text-align: center;">
+        <a class="btn btn-success" href="{% url 'create test' %}">Створити тест</a>
+    </div>
+    <div style="padding-top: 15px;">
+        {% for test in test_list %}
+            <p><a href="{% url 'update test' pk=test.id %}">{{ test }}</a></p>
+        {% endfor %}
+    </div>
+{% endblock %}

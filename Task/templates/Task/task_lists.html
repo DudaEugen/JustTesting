@@ -1,0 +1,11 @@
+{% extends "JustTesting/base.html" %}
+
+{% block title %}
+    Списки завдань
+{% endblock %}
+
+{% block content %}
+    {% for task_list in task_lists %}
+        <p>{{ task_list }}</p>
+    {% endfor %}
+{% endblock %}
