@@ -135,7 +135,8 @@ class TestingResultView(DetailView):
         except TestingSession.DoesNotExist:
             raise Http404("Incorrect session pk")
 
-        if not session.is_correct_user(self.request):
+        if not session.is_correct_user(self.request) and not (self.request.user.is_authenticated and 
+                self.request.user.has_perm("Testing.view_testingsession")):
             raise Http404("Incorrect session pk")
         return session
 
@@ -170,10 +171,15 @@ class ActiveTestingSessions(ListView):
         return TestingSessionOfAutorizedUser.get_active_sessions(self.request)
 
 
-@method_decorator(user_permissions_decorator, name="dispatch")
 class ResultsDispatcherView(FormView):
     template_name = "Testing/results_dispatcher.html"
     form_class = ResultsDispatcherForm
+
+    def dispatch(self, request, *args: Any, **kwargs: Any):
+        if not (self.request.user.is_authenticated and 
+                self.request.user.has_perm("Testing.view_testingsession")):
+            raise Http404("You don't have permissions for view this page")
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         fd = form.cleaned_data["from_date"]
@@ -185,10 +191,15 @@ class ResultsDispatcherView(FormView):
         }))
 
 
-@method_decorator(user_permissions_decorator, name="dispatch")
 class ResultsView(ListView):
     template_name = "Testing/results.html"
     context_object_name = "sessions"
+
+    def dispatch(self, request, *args: Any, **kwargs: Any):
+        if not (self.request.user.is_authenticated and 
+                self.request.user.has_perm("Testing.view_testingsession")):
+            raise Http404("You don't have permissions for view this page")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_dates(self) -> Tuple[timezone.datetime, timezone.datetime]:
         from_date = self.kwargs["from"]

@@ -20,7 +20,7 @@
                 {{ navbar_brand }}
             </a>
         {% endif %}
-        {% if request.user.is_authenticated and request.user.is_superuser %}
+        {% if request.user.is_authenticated and request.user.is_superuser or can_view_results %}
             <button class="navbar-toggler" type="button" data-toggle="collapse" 
                     data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -28,24 +28,30 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active my-2 mx-3">
-                        <a class="nav-link btn btn-secondary" 
-                            href="{% url 'test list' %}">
-                            Тести
-                        </a>
-                    </li>
-                    <li class="nav-item active my-2 mx-3">
-                        <a class="nav-link btn btn-secondary" 
-                            href="{% url 'task lists' %}">
-                            Завдання
-                        </a>
-                    </li>
-                    <li class="nav-item active my-2 mx-3">
-                        <a class="nav-link btn btn-secondary" 
-                            href="{% url 'results dispatcher' %}">
-                            Результати
-                        </a>
-                    </li>
+                    {% if request.user.is_authenticated and request.user.is_superuser %}
+                        <li class="nav-item active my-2 mx-3">
+                            <a class="nav-link btn btn-secondary" 
+                                href="{% url 'test list' %}">
+                                Тести
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if request.user.is_authenticated and request.user.is_superuser %}
+                        <li class="nav-item active my-2 mx-3">
+                            <a class="nav-link btn btn-secondary" 
+                                href="{% url 'task lists' %}">
+                                Завдання
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if can_view_results %}
+                        <li class="nav-item active my-2 mx-3">
+                            <a class="nav-link btn btn-secondary" 
+                                href="{% url 'results dispatcher' %}">
+                                Результати
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
         {% endif %}
                 {% block auth_link %}
