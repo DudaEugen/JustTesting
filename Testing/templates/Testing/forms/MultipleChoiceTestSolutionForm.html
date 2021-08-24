@@ -10,7 +10,7 @@
 {% block form %}
     <form method="post" onsubmit="solution_check(event, this)">
     {% csrf_token %}
-    <div>{{ form.fields.selected_answers.label }}</div>
+    <div>{{ form.fields.selected_answers.label|safe }}</div>
 
     <div class="answers {% if form.selected_answers.errors %} error_answers {% endif %}">
         {% for error in form.selected_answers.errors %}
@@ -21,7 +21,7 @@
                 <input type="checkbox" name="{{ form.selected_answers.name }}" value="{{ value }}"
                        style="display: none;">
                 <span>
-                    {{ answer }}
+                    {{ answer|safe }}
                 </span>
             </div>
         {% endfor %}
