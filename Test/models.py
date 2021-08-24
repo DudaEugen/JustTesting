@@ -48,6 +48,11 @@ class Test(models.Model):
         verbose_name="Неавторизовані користувачі",
         help_text="Чи дозволено проходження цього тесту для неавторизованих користувачів?",
     )
+    is_allow_help = models.BooleanField(
+        default=False,
+        verbose_name="Підказка",
+        help_text="Чи дозволено використовувати підказки?",
+    )
 
     def __str__(self):
         return self.name

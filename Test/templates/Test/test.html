@@ -50,6 +50,17 @@
                     {% endwith %}
                     {% endwith %}
                 </p>
+
+                <p>
+                    <!-- input is_allow_help -->
+                    {% with input=form.is_allow_help %}
+                    {% with label=form.is_allow_help.label %}
+                    {% with small_text=form.is_allow_help.help_text %}
+                        {% include "JustTesting/forms/fields/input.html" %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                </p>
             {% endwith %}
 
             <!-- inline forms -->

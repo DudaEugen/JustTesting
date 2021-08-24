@@ -10,6 +10,7 @@ class TestWithTaskListForm(ModelAndInlineFormsetContainer):
         "duration",
         "is_allowed",
         "is_allow_for_unautorized_users",
+        "is_allow_help",
     )
     inline_model = M2MTaskListInTest
     inline_model_fields = "__all__"

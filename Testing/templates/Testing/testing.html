@@ -33,4 +33,16 @@
         {% block form %}
         {% endblock %}
     </div>
+    {% if help %}
+        <div style="text-align: right">
+            <span class="btn btn-warning" 
+                  onclick="document.getElementById('id_help').removeAttribute('style'); 
+                           this.parentNode.removeChild(this)">
+                Підказка
+            </span>
+            <div id="id_help" style="display: none">
+                {{ help }}
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

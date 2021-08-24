@@ -21,7 +21,7 @@ class MultipleChoiceTestAnswerInlineFormset(forms.models.BaseInlineFormSet):
 
 class MultipleChoiceTestWithAnswersForm(ModelAndInlineFormsetContainer):
     model = MultipleChoiceTest
-    model_fields = ("task_list", "text")
+    model_fields = ("task_list", "text", "help_text")
     inline_model = MultipleChoiceTestAnswer
     inline_model_fields = "__all__"
     formset = MultipleChoiceTestAnswerInlineFormset

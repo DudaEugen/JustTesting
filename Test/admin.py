@@ -14,6 +14,7 @@ class TestAdmin(admin.ModelAdmin):
         "name",
         "is_allowed",
         "is_allow_for_unautorized_users",
+        "is_allow_help",
     )
     search_fields = (
         "name",
@@ -21,6 +22,7 @@ class TestAdmin(admin.ModelAdmin):
     list_filter = (
         "is_allowed",
         "is_allow_for_unautorized_users",
+        "is_allow_help",
     )
     inlines = (
         TaskListInTestInline,

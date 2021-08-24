@@ -74,6 +74,13 @@ class Task(models.Model):
         verbose_name="Список завдань",
         help_text="Оберіть список завдань",
     )
+    help_text = models.TextField(
+        null=True,
+        blank=True,
+        default="",
+        verbose_name="Підказка",
+        help_text="Введіть текст підказки до завдання",
+    )
     objects = InheritanceManager()
 
 

@@ -112,6 +112,8 @@ class TestingView(FormView):
         context = super().get_context_data(**kwargs)
         context["session"] = self.kwargs["session"]
         context["number_of_task_left"] = context["session"].task_set.filter(is_completed=False).count()
+        if context["session"].test.is_allow_help:
+            context["help"] = self.kwargs["task"].help_text
         return context
 
     def form_valid(self, form):

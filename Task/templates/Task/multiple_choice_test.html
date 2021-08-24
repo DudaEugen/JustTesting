@@ -31,6 +31,14 @@
                     {% include "JustTesting/forms/fields/textarea.html" %}
                 {% endwith %}
                 {% endwith %}
+
+                <br>
+                <p>{{ form.help_text.label }}:</p>
+                {% with textarea=form.help_text %}
+                {% with placeholder=form.help_text.help_text %}
+                    {% include "JustTesting/forms/fields/textarea.html" %}
+                {% endwith %}
+                {% endwith %}
             {% endwith %}
             
             <!-- inline forms -->
