@@ -20,16 +20,19 @@ class TaskInTestingSessionInline(admin.TabularInline):
 class TestingSessionOfAutorizedUserAdmin(admin.ModelAdmin):
     list_display = (
         "user",
+        "group",
         "test",
         "begin",
         "result",
     )
     search_fields = (
         "user",
+        "group",
         "test",
     )
     readonly_fields = (
         "user",
+        "group",
         "test",
         "begin",
         "end",
@@ -42,17 +45,20 @@ class TestingSessionOfAutorizedUserAdmin(admin.ModelAdmin):
 
 class TestingSessionOfUnautorizedUserAdmin(admin.ModelAdmin):
     list_display = (
-        "information",
+        "display_name",
+        "group",
         "test",
         "begin",
         "result",
     )
     search_fields = (
-        "information",
+        "display_name",
+        "group",
         "test",
     )
     readonly_fields = (
-        "information",
+        "display_name",
+        "group",
         "test",
         "begin",
         "end",

@@ -23,10 +23,10 @@
             {% endwith %}
             <br>
 
-            {% if form.information %}
-                {% with input=form.information %}
+            {% if form.display_name %}
+                {% with input=form.display_name %}
                 {% with label="Користувач" %}
-                {% with placeholder=form.fields.information.help_text %}
+                {% with placeholder=form.fields.display_name.help_text %}
                     {% include "JustTesting/forms/fields/input.html" %}
                 {% endwith %}
                 {% endwith %}
@@ -34,11 +34,20 @@
                 <br>
             {% endif %}
 
+            {% with input=form.group %}
+            {% with label="Група" %}
+            {% with placeholder=form.fields.group.help_text %}
+                {% include "JustTesting/forms/fields/input.html" %}
+            {% endwith %}
+            {% endwith %}
+            {% endwith %}
+            <br>
+            
             {% for error in form.non_field_errors %}
                 <p class="error">{{ error }}</p>
             {% endfor %}
 
-            <input type="submit" value="Почати" class="btn btn-primary">
+            <input type="submit" value="Розочати" class="btn btn-primary">
         </form>
     </div>
     <br>

@@ -23,11 +23,19 @@
                 </td>
                 <td>
                     {% if object.user %}
-                        {{ object.user.first_name }} {{ object.user.last_name }} ({{ object.user.username }})
+                        {{ object.user.username }}
                         <span class="user__checkmark" title="Користувач авторизувався">&#10003;</span>
                     {% else %}
-                        {{ object.information }}
+                        {{ object.display_name }}
                     {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="row_name">
+                    Група:
+                </td>
+                <td>
+                    {{ object.group }}
                 </td>
             </tr>
             <tr>

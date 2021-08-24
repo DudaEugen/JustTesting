@@ -21,7 +21,7 @@ class TestingSessionOfAutorizedUserForm(forms.ModelForm):
 
     class Meta:
         model = models.TestingSessionOfAutorizedUser
-        fields = ["test"]
+        fields = ["test", "group"]
 
 
 class TestingSessionOfUnautorizedUserForm(forms.ModelForm):
@@ -39,7 +39,7 @@ class TestingSessionOfUnautorizedUserForm(forms.ModelForm):
 
     class Meta:
         model = models.TestingSessionOfUnautorizedUser
-        fields = ["test", "information"]
+        fields = ["test", "display_name", "group"]
 
 
 class MultipleChoiceTestSolutionForm(forms.Form):

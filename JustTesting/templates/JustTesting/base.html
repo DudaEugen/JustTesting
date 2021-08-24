@@ -20,7 +20,7 @@
                 {{ navbar_brand }}
             </a>
         {% endif %}
-        {% if request.user.is_authenticated and request.user.is_superuser or can_view_results %}
+        {% if request.user.is_authenticated %}
             <button class="navbar-toggler" type="button" data-toggle="collapse" 
                     data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -29,15 +29,13 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     {% if request.user.is_authenticated and request.user.is_superuser %}
-                        <li class="nav-item active my-2 mx-3">
+                        <li class="nav-item active my-2 mx-2">
                             <a class="nav-link btn btn-secondary" 
                                 href="{% url 'test list' %}">
                                 Тести
                             </a>
                         </li>
-                    {% endif %}
-                    {% if request.user.is_authenticated and request.user.is_superuser %}
-                        <li class="nav-item active my-2 mx-3">
+                        <li class="nav-item active my-2 mx-2">
                             <a class="nav-link btn btn-secondary" 
                                 href="{% url 'task lists' %}">
                                 Завдання
@@ -45,10 +43,17 @@
                         </li>
                     {% endif %}
                     {% if can_view_results %}
-                        <li class="nav-item active my-2 mx-3">
+                        <li class="nav-item active my-2 mx-2">
                             <a class="nav-link btn btn-secondary" 
                                 href="{% url 'results dispatcher' %}">
                                 Результати
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if request.user.is_authenticated %}
+                        <li class="nav-item active my-2 mx-2">
+                            <a class="nav-link">
+                                {{ request.user.username }}
                             </a>
                         </li>
                     {% endif %}
@@ -57,12 +62,12 @@
                 {% block auth_link %}
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'logout' %}" 
-                            class="btn btn-danger btn text-light nav-link my-2 mx-3">
+                            class="btn btn-danger btn text-light nav-link my-2 mx-2">
                             Вихід
                         </a>
                     {% else %}
                         <a href="{% url 'login' %}" 
-                            class="btn btn-success btn text-light nav-link my-2 mx-3">
+                            class="btn btn-success btn text-light nav-link my-2 mx-2">
                             Вхід
                         </a>
                     {% endif %}

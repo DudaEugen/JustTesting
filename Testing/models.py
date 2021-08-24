@@ -180,16 +180,24 @@ class M2MTaskInTestingSession(models.Model):
 
 
 class TestingSessionOfUnautorizedUser(TestingSession):
-    information = models.CharField(
+    display_name = models.CharField(
         max_length=100,
         null=False,
         blank=False,
-        verbose_name="Інформація про користувача",
-        help_text="Прізвище, ім'я, номер групи, тощо",
+        verbose_name="ПІБ",
+        help_text="Введіть прізвище, ім'я",
+    )
+    group = models.CharField(
+        max_length=20,
+        null=False,
+        blank=True,
+        default="",
+        verbose_name="Група",
+        help_text="Вкажіть групу",
     )
 
     def __str__(self):
-        return "%s (%s)" % (self.information, self.test)
+        return "%s (%s)" % (self.display_name, self.test)
 
     class Meta:
         verbose_name = "Сесія тестування неавторизованого користувача"
@@ -226,6 +234,14 @@ class TestingSessionOfAutorizedUser(TestingSession):
         blank=False,
         verbose_name="Коричтувач",
         help_text="Користувач, що проходив цю сесію тестування",
+    )
+    group = models.CharField(
+        max_length=20,
+        null=False,
+        blank=True,
+        default="",
+        verbose_name="Група",
+        help_text="Вкажіть групу",
     )
 
     def __str__(self):

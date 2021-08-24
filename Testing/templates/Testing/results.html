@@ -24,6 +24,7 @@
         <thead>
             <tr>
                 <th>Користувач</th>
+                <th>Група</th>
                 <th>Початок</th>
                 <th>Завершення</th>
                 <th>Результат</th>
@@ -33,10 +34,10 @@
                 <tr>
                     <td>
                         {% if session.user %}
-                            {{ session.user.first_name }} {{ session.user.last_name }} ({{ session.user.username }})
+                            {{ session.user.display_name }}
                             <span class="user__checkmark" title="Користувач авторизувався">&#10003;</span>
                         {% else %}
-                            {{ session.information }}
+                            {{ session.names }}
                         {% endif %}
                     </td>
                     <td>{{ session.begin|date:"d.m.y H:i" }}</td>
