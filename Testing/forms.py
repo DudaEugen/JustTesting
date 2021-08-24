@@ -4,6 +4,7 @@ from . import models
 from Test.models import Test
 from Task.models import MultipleChoiceTest, MultipleChoiceTestAnswer
 from typing import Dict, Any
+from django.utils import timezone
 
 
 class TestingSessionOfAutorizedUserForm(forms.ModelForm):
@@ -67,3 +68,22 @@ class MultipleChoiceTestSolutionForm(forms.Form):
         for answer in self.cleaned_data['selected_answers']:
             solution.selected_answers.add(MultipleChoiceTestAnswer.objects.get(id=answer))
         solution.compute_and_save_result_if_not_exist()
+
+
+class ResultsDispatcherForm(forms.Form):
+    test = forms.ModelChoiceField(
+        queryset=Test.objects.all(),
+        required=True,
+        label="Тест",
+        help_text="Оберіть тест",
+    )
+    from_date = forms.DateField(
+        required=True,
+        label="Від",
+        initial=timezone.now,
+    )
+    to_date = forms.DateField(
+        required=True,
+        label="До",
+        initial=timezone.now,
+    )

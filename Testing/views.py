@@ -2,10 +2,15 @@ from django.http.response import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import CreateView, FormView, DetailView, ListView
 from django.http import Http404
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from .models import *
-from .forms import TestingSessionOfAutorizedUserForm, TestingSessionOfUnautorizedUserForm
+from .forms import TestingSessionOfAutorizedUserForm, TestingSessionOfUnautorizedUserForm,\
+                   ResultsDispatcherForm
 from django.utils import timezone
-from typing import Dict, Any
+from django.utils.decorators import method_decorator
+from JustTesting.utils.permission_decorators import user_permissions_decorator
+from typing import Dict, Any, Tuple
 
 
 class TestingSessionCreateView(CreateView):
@@ -163,3 +168,58 @@ class ActiveTestingSessions(ListView):
     
     def get_queryset(self):
         return TestingSessionOfAutorizedUser.get_active_sessions(self.request)
+
+
+@method_decorator(user_permissions_decorator, name="dispatch")
+class ResultsDispatcherView(FormView):
+    template_name = "Testing/results_dispatcher.html"
+    form_class = ResultsDispatcherForm
+
+    def form_valid(self, form):
+        fd = form.cleaned_data["from_date"]
+        td = form.cleaned_data["to_date"]
+        return HttpResponseRedirect(reverse("testing results", kwargs={
+            "test_pk": form.cleaned_data["test"].id,
+            "from": f"{fd.day:02d}.{fd.month:02d}.{fd.year}",
+            "to": f"{td.day:02d}.{td.month:02d}.{td.year}",
+        }))
+
+
+@method_decorator(user_permissions_decorator, name="dispatch")
+class ResultsView(ListView):
+    template_name = "Testing/results.html"
+    context_object_name = "sessions"
+
+    def get_dates(self) -> Tuple[timezone.datetime, timezone.datetime]:
+        from_date = self.kwargs["from"]
+        to_date = self.kwargs["to"]
+        return (
+            timezone.datetime(
+                day=int(from_date[:2]), month=int(from_date[3:5]), year=int(from_date[6:])
+            ), 
+            timezone.datetime(
+                day=int(to_date[:2]), month=int(to_date[3:5]), year=int(to_date[6:]), 
+                hour=23, minute=59, second=59
+            )
+        )
+
+    def get_queryset(self):
+        begin_date, end_date = self.get_dates()
+        self.kwargs["test"] = get_object_or_404(Test, id=self.kwargs["test_pk"])
+
+        sessions = TestingSession.objects.select_derivatives().filter(
+            test_id=self.kwargs["test"].id, begin__gte=begin_date
+        ).filter(
+            Q(end__lte=end_date) & Q(end__lte=timezone.now()) | Q(result__isnull=False)
+        ).order_by("-end")
+        for session in sessions:
+            session.compute_and_save_result_if_not_exist(force_recalculate=session.result is None)
+        return sessions
+    
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["test"] = self.kwargs["test"]
+        dates = self.get_dates()
+        context["from_date"] = dates[0]
+        context["to_date"] = dates[1]
+        return context

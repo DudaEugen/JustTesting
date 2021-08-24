@@ -1,0 +1,50 @@
+{% extends 'JustTesting/base.html' %}
+
+{% block title %}
+    Результати тестувань
+{% endblock %}
+
+{% block static_load %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Testing/css/result.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="results_header">
+        {{ test.name }}
+        <p class="date_info">
+            {% if from_date|date:"d.m.Y" != to_date|date:"d.m.Y" %}
+                {{ from_date|date:"d.m.Y" }}-{{ to_date|date:"d.m.Y" }}
+            {% else %}
+                {{ from_date|date:"d.m.Y" }}
+            {% endif %}
+        </p>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Користувач</th>
+                <th>Початок</th>
+                <th>Завершення</th>
+                <th>Результат</th>
+            </tr>
+        </thead>
+            {% for session in sessions %}
+                <tr>
+                    <td>
+                        {% if session.user %}
+                            {{ session.user.first_name }} {{ session.user.last_name }} ({{ session.user.username }})
+                            <span class="user__checkmark" title="Користувач авторизувався">&#10003;</span>
+                        {% else %}
+                            {{ session.information }}
+                        {% endif %}
+                    </td>
+                    <td>{{ session.begin|date:"d.m.y H:i" }}</td>
+                    <td>{{ session.end|date:"d.m.y H:i" }}</td>
+                    <td>{{ session.result|floatformat }}%</td>
+                </tr>
+            {% endfor %}
+        <tbody>
+        </tbody>
+    </table>
+{% endblock %}

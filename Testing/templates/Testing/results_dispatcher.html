@@ -1,0 +1,40 @@
+{% extends 'JustTesting/base.html' %}
+
+{% block title %}
+    Результати тестувань
+{% endblock %}
+
+{% block static_load %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'JustTesting/css/form.css' %}">
+    <script src="{% static 'JustTesting/js/select_input.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+    {% csrf_token %}
+        {% with select=form.test %}
+        {% with queryset=form.fields.test.queryset %}
+        {% with placeholder=form.test.help_text %}
+            {% include "JustTesting/forms/fields/select_input.html" %}
+        {% endwith %}
+        {% endwith %}
+        {% endwith %}
+        <br>
+        <p>Дати необхідно вводити у форматі: дд.мм.рррр</p>
+        <p>Наприклад: 10.11.2020, 05.02.2021</p>
+        {% with input=form.from_date %}
+        {% with initial=input.value|date:"d.m.Y" label=input.label required=True %}
+            {% include "JustTesting/forms/fields/input.html" %}
+        {% endwith %}
+        {% endwith %}
+        <br>
+        {% with input=form.to_date %}
+        {% with initial=input.value|date:"d.m.Y" label=input.label required=True %}
+            {% include "JustTesting/forms/fields/input.html" %}
+        {% endwith %}
+        {% endwith %}
+        <br>
+        <input type="submit" value="Отримати результати" class="btn btn-success">
+    </form>
+{% endblock %}

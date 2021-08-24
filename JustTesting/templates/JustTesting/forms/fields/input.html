@@ -17,7 +17,9 @@
        {% if placeholder %} 
             placeholder="{{ placeholder }}"
        {% endif %}
-       {% if input.value is not None %} 
+       {% if initial is not None %}
+            value="{{ initial }}"
+       {% elif input.value is not None %} 
             {% if input.field.widget.input_type != "checkbox" %}
                 value="{{ input.value }}"
             {% elif input.value %}

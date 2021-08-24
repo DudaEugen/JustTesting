@@ -18,3 +18,13 @@ table {
     font-weight: bold;
     text-align: right;
 }
+
+.results_header {
+    text-align: center;
+    font-size: large;
+    padding-bottom: 15px;
+}
+
+.date_info {
+    font-size: small;
+}
