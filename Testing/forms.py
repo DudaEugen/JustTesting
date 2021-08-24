@@ -25,16 +25,24 @@ class TestingSessionOfAutorizedUserForm(forms.ModelForm):
 
 
 class TestingSessionOfUnautorizedUserForm(forms.ModelForm):
-    def __init__(self, active_user_sessions, *args, **kwargs):
+    def __init__(self, active_user_sessions, ip=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["test"].queryset = Test.objects.filter(
             is_allowed=True, is_allow_for_unautorized_users=True)
         self.active_user_sessions = active_user_sessions
+        self.ip = ip
     
     def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()
         if len(self.active_user_sessions) > 0:
             self.add_error(field=None, error="Ви маєте незавершенні тестування")
+        if self.ip is not None:
+            # unauthorized user can't beginning lot of session during hour
+            count = models.TestingSessionOfUnautorizedUser.objects.filter(
+                ip_begin=self.ip, begin__gte=timezone.now() - timezone.timedelta(hours=1)
+            ).count()
+            if count > 5:
+                self.add_error(field=None, error="Ви не можете зараз розпочати тестування. Спробуйте пізніше")
         return cleaned_data
 
     class Meta:

@@ -195,6 +195,12 @@ class TestingSessionOfUnautorizedUser(TestingSession):
         verbose_name="Група",
         help_text="Вкажіть групу",
     )
+    ip_begin = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        verbose_name="IP",
+        help_text="IP, з якого була сьворена сесія тестування",
+    )
 
     def __str__(self):
         return "%s (%s)" % (self.display_name, self.test)

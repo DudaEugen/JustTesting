@@ -49,12 +49,14 @@ class TestingSessionOfUnautorizedUserAdmin(admin.ModelAdmin):
         "group",
         "test",
         "begin",
+        "ip_begin",
         "result",
     )
     search_fields = (
         "display_name",
         "group",
         "test",
+        "ip_begin",
     )
     readonly_fields = (
         "display_name",
@@ -62,6 +64,7 @@ class TestingSessionOfUnautorizedUserAdmin(admin.ModelAdmin):
         "test",
         "begin",
         "end",
+        "ip_begin",
         "result",
     )
     inlines = (

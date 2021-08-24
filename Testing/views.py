@@ -36,10 +36,10 @@ class TestingSessionCreateView(CreateView):
                     initial=self.get_initial())
         else:
             if self.request.POST:
-                return TestingSessionOfUnautorizedUserForm(self.kwargs["active_sessions"], self.request.POST,
-                        initial=self.get_initial())
+                return TestingSessionOfUnautorizedUserForm(self.kwargs["active_sessions"],
+                        self.get_client_ip(), self.request.POST, initial=self.get_initial())
             return TestingSessionOfUnautorizedUserForm(self.kwargs["active_sessions"], 
-                    initial=self.get_initial())
+                    self.get_client_ip(), initial=self.get_initial())
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -54,6 +54,7 @@ class TestingSessionCreateView(CreateView):
             test_session.user = self.request.user
             test_session.save()
         else:
+            test_session.ip_begin = self.get_client_ip()
             test_session.save(self.request.session)
         self.kwargs["session"] = test_session
         return HttpResponseRedirect(self.get_success_url())
@@ -61,6 +62,13 @@ class TestingSessionCreateView(CreateView):
     def get_success_url(self) -> str:
         return f"session={self.kwargs['session'].pk}"
 
+    def get_client_ip(self):
+        x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = self.request.META.get('REMOTE_ADDR')
+        return ip
 
 class TestingView(FormView):
     def get_session(self):
