@@ -46,3 +46,10 @@ function setTimeDelta() {
 window.onload = setTimeDelta;
 
 var SetTimeDeltaIntervalId = setInterval(setTimeDelta, 1000);
+
+var noSelectRefresh = setInterval(function() {
+    let noselect = document.getElementById("task_wrapper");
+    if (!noselect.classList.contains("noselect")) {
+        noselect.classList.add("noselect");
+    }
+}, 500);

@@ -59,13 +59,14 @@ class MultipleChoiceTestSolutionForm(forms.Form):
 
     def __init__(self, task_in_session: models.M2MTaskInTestingSession,  *args, **kwargs):
         import random
+        from .utils.obfuscation import insert_invisible_elements as obfuscate
 
         super().__init__(*args, **kwargs)
         self.task_in_testing_session = task_in_session
         multiple_choice_test: MultipleChoiceTest = self.task_in_testing_session.task.multiplechoicetest
-        self.fields["selected_answers"].label = multiple_choice_test.text
+        self.fields["selected_answers"].label = obfuscate(multiple_choice_test.text)
         self.fields["selected_answers"].choices = [
-            (option.id, option.text) for option in multiple_choice_test.answer_set.all()
+            (option.id, obfuscate(option.text)) for option in multiple_choice_test.answer_set.all()
         ]
         random.shuffle(self.fields["selected_answers"].choices)
 

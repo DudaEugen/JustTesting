@@ -29,7 +29,7 @@
                   data-timeout-url="{% url 'testing result' pk=session.id %}"></span>
         </div>
     </div>
-    <div class="form-wrapper">
+    <div id="task_wrapper" class="form-wrapper noselect">
         {% block form %}
         {% endblock %}
     </div>
