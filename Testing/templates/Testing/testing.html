@@ -15,6 +15,10 @@
 
 {% block content %}
     <div class="testing_header">
+        <div style="text-align: right">
+            <a class="btn btn-danger text-white" title="Завершити тестування"
+               href="{% url 'close testing session' pk=session.pk %}"> Х </a>
+        </div>
         <div class="testing_name">{{ session.test.name }}</div>
         <div class="testing_info">
             Залишилось питань: {{ number_of_task_left }}

@@ -1,6 +1,6 @@
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import CreateView, FormView, DetailView, ListView
+from django.views.generic import CreateView, FormView, DetailView, ListView, RedirectView
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -70,6 +70,7 @@ class TestingSessionCreateView(CreateView):
             ip = self.request.META.get('REMOTE_ADDR')
         return ip
 
+
 class TestingView(FormView):
     def get_session(self):
         try:
@@ -131,6 +132,19 @@ class TestingView(FormView):
 
     def get_success_url(self) -> str:
         return f"session={self.kwargs['pk']}"
+
+
+class CloseTestingSessionView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        testing_session = TestingSession.objects.select_derivatives().get(pk=self.kwargs.get("pk"))
+        if testing_session.is_correct_user(self.request):
+            testing_session.compute_and_save_result_if_not_exist(
+                force_recalculate=testing_session.result is None
+            )
+            self.url = 'result'
+        else:
+            raise Http404("It is not your session")
+        return super().get_redirect_url(*args, **kwargs)
 
 
 class TestingResultView(DetailView):
