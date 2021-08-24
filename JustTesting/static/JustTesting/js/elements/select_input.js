@@ -1,7 +1,7 @@
 const linkPlaceholder = "12345678901234567890";
 
 function linkToTest(inputList) {
-    let link = document.getElementById("test_link");
+    let link = document.getElementById("id_link");
 
     let value = "";
     let options = document.getElementById(inputList.getAttribute("list")).getElementsByTagName("option");

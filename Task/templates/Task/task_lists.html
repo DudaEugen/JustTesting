@@ -4,8 +4,20 @@
     Списки завдань
 {% endblock %}
 
+{% block static_load %}
+    {% load static %}
+    <script src="{% static 'JustTesting/js/elements/select_input.js' %}"></script>
+{% endblock %}
+
 {% block content %}
-    {% for task_list in task_lists %}
-        <p>{{ task_list }}</p>
-    {% endfor %}
+    <div>
+        {% with queryset=task_lists list_name="task_lists" placeholder="Назва переліку завдань" %}
+            {% include "JustTesting/elements/select_input.html" with onselect_function="linkToTest(this)" %}
+        {% endwith %}
+        <br>
+        <a id="id_link" class="btn btn-info" 
+            data-link={% url 'multiple choice tests of task list' task_list_pk="12345678901234567890" %}>
+            Переглянути завдання
+        </a>
+    </div>
 {% endblock %}

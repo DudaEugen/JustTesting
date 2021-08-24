@@ -13,6 +13,15 @@ class TaskListView(ListView):
 
 
 @method_decorator(user_permissions_decorator, name="dispatch")
+class MultipleChoiceTestsOfTaskLisk(ListView):
+    template_name = "Task/multiple_choice_test_of_task_list.html"
+    context_object_name = "task_list"
+
+    def get_queryset(self):
+        return MultipleChoiceTest.objects.filter(task_list_id=self.kwargs["task_list_pk"])
+
+
+@method_decorator(user_permissions_decorator, name="dispatch")
 class MultipleChoiceTestCreateView(CreateView):
     form_class = MultipleChoiceTestWithAnswersForm
     template_name = "Task/multiple_choice_test_create.html"

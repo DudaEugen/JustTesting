@@ -1,0 +1,30 @@
+{% extends "JustTesting/base.html" %}
+
+{% block title %}
+    Завдання з вибором кількох варіантів відповіді
+{% endblock %}
+
+{% block static_load %}
+    {% load static %}
+    <script src="{% static 'JustTesting/js/elements/select_input.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div style="text-align: center;">
+        <a class="btn btn-success" href="{% url 'create multiple choice test' %}">
+            Створити завдання
+        </a>
+    </div>
+
+    <div style="padding-top: 15px;">
+        {% with queryset=task_list list_name="task_list" label="Завдання" %}
+        {% with placeholder="Почніть вводити умову завдання" %}
+            {% include "JustTesting/elements/select_input.html" with onselect_function="linkToTest(this)" %}
+        {% endwith %}
+        {% endwith %}
+        <a id="id_link" class="btn btn-info" 
+            data-link={% url 'update multiple choice test' pk="12345678901234567890" %}>
+            Редагувати завдання
+        </a>
+    </div>
+{% endblock %}
