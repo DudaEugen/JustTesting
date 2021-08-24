@@ -4,13 +4,21 @@
     Перелік тестів
 {% endblock %}
 
+{% block static_load %}
+    {% load static %}
+    <script src="{% static 'Test/js/test_select_input.js' %}"></script>
+{% endblock %}
+
 {% block content %}
     <div style="text-align: center;">
         <a class="btn btn-success" href="{% url 'create test' %}">Створити тест</a>
     </div>
     <div style="padding-top: 15px;">
-        {% for test in test_list %}
-            <p><a href="{% url 'update test' pk=test.id %}">{{ test }}</a></p>
-        {% endfor %}
+        {% with queryset=test_list list_name="test_list" label="Тест" placeholder="Оберіть тест" %}
+            {% include "JustTesting/elements/select_input.html" with onselect_function="linkToTest(this)" %}
+        {% endwith %}
+        <a id="test_link" class="btn btn-info" data-link={% url 'update test' pk="12345678901234567890" %}>
+            Редагувати обраний тест
+        </a>
     </div>
 {% endblock %}
