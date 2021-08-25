@@ -32,7 +32,7 @@ class TaskList(models.Model):
     """
     knowledge_field = models.ForeignKey(
         KnowledgeField,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         verbose_name="Область знань",
