@@ -140,15 +140,34 @@ class TestingView(FormView):
 
 class CloseTestingSessionView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        testing_session = TestingSession.objects.select_derivatives().get(pk=self.kwargs.get("pk"))
-        if testing_session.is_correct_user(self.request):
-            testing_session.compute_and_save_result_if_not_exist(
-                force_recalculate=testing_session.result is None
-            )
-            self.url = 'result'
-        else:
+        testing_session = TestingSession.objects.select_derivatives().get(pk=self.kwargs["pk"])
+        if not testing_session.is_correct_user(self.request):
             raise Http404("It is not your session")
+        testing_session.compute_and_save_result_if_not_exist(
+            force_recalculate=testing_session.result is None
+        )
+        self.url = 'result'    
         return super().get_redirect_url(*args, **kwargs)
+
+
+class SkipTaskView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        testing_session = TestingSession.objects.select_derivatives().get(pk=self.kwargs["session_pk"])
+        if not testing_session.is_correct_user(self.request):
+            raise Http404("It is not your session")
+        if not testing_session.test.is_allow_skip_task:
+            self.url = reverse("testing", kwargs={"pk": testing_session.id})
+        else:
+            task_in_session = M2MTaskInTestingSession.objects.filter(
+                session_id=self.kwargs["session_pk"], is_completed=False, task__isnull=False
+            ).first()
+            if task_in_session is None:
+                self.url = reverse("testing result", kwargs={"pk": testing_session.id})
+            else:
+                task_in_session.order += 1
+                task_in_session.save()
+                self.url = reverse("testing", kwargs={"pk": testing_session.id})
+        return self.url
 
 
 class TestingResultView(DetailView):

@@ -53,6 +53,12 @@ class Test(models.Model):
         verbose_name="Підказка",
         help_text="Чи дозволено використовувати підказки?",
     )
+    is_allow_skip_task = models.BooleanField(
+        default=False,
+        verbose_name="Пропуск завдання",
+        help_text="Чи дозволено пропускати завдання? "
+                  "(В кінці тестування пропущені завдання знов з'являться)",
+    )
 
     def __str__(self):
         return self.name

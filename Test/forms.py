@@ -11,6 +11,7 @@ class TestWithTaskListForm(ModelAndInlineFormsetContainer):
         "is_allowed",
         "is_allow_for_unautorized_users",
         "is_allow_help",
+        "is_allow_skip_task",
     )
     inline_model = M2MTaskListInTest
     inline_model_fields = "__all__"

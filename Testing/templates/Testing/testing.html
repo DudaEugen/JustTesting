@@ -44,5 +44,14 @@
                 {{ help }}
             </div>
         </div>
+        <br>
+    {% endif %}
+    {% if session.test.is_allow_skip_task %}
+        <div style="text-align: right">
+            <a href="{% url 'skip task' session_pk=session.id %}" class="btn btn-secondary">
+                Пропустити
+            </a>
+        </div>
+        <br>
     {% endif %}
 {% endblock %}
