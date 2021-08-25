@@ -62,6 +62,21 @@ class TestingSession(models.Model):
         if self._state.adding:
             self._set_begin_and_end_if_none()
         super().save()
+    
+    def clean_fields(self, exclude=None):
+        from django.forms import ValidationError
+        from Test.models import M2MTaskListInTest
+
+        super().clean_fields(exclude)
+        task_lists_in_test = M2MTaskListInTest.objects.filter(test=self.test)
+        for task_list_in_test in task_lists_in_test:
+            try:
+                task_list_in_test.clean()
+            except ValidationError:
+                raise ValidationError(
+                    "Тестування не може бути розпочато, оскільки не вистачає питань для його формування. "
+                    "Зверніться до адміністратора."
+                )
 
     def _set_begin_and_end_if_none(self):
         if not self.begin:
@@ -276,19 +291,10 @@ def _create_task_set_for_test_session(sender, instance, created: bool, *args, **
     create set of M2MTaskInTestingSession for test_session when session created.
     """
     import random
-    from django.forms import ValidationError
     from Test.models import M2MTaskListInTest
 
     if created:
-        task_lists_in_test = M2MTaskListInTest.objects.filter(
-            test=instance.test)
-        for task_list_in_test in task_lists_in_test:
-            try:
-                task_list_in_test.clean()
-            except ValidationError:
-                instance.delete()
-                raise
-
+        task_lists_in_test = M2MTaskListInTest.objects.filter(test=instance.test)
         for task_list_in_test in task_lists_in_test:
             tasks = list(task_list_in_test.task_list.task_set.all())
             for _ in range(task_list_in_test.task_count):
