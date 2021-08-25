@@ -228,16 +228,18 @@ class ResultsView(ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_dates(self) -> Tuple[timezone.datetime, timezone.datetime]:
+        from django.utils.timezone import make_aware
+
         from_date = self.kwargs["from"]
         to_date = self.kwargs["to"]
         return (
-            timezone.datetime(
+            make_aware(timezone.datetime(
                 day=int(from_date[:2]), month=int(from_date[3:5]), year=int(from_date[6:])
-            ), 
-            timezone.datetime(
+            )), 
+            make_aware(timezone.datetime(
                 day=int(to_date[:2]), month=int(to_date[3:5]), year=int(to_date[6:]), 
                 hour=23, minute=59, second=59
-            )
+            ))
         )
 
     def get_queryset(self):
