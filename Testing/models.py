@@ -85,7 +85,9 @@ class TestingSession(models.Model):
 
     def _calculate_result(self, force_recalculate: bool = False) -> float:
         if force_recalculate or self.result is None:
-            tasks_in_session = {task.id for task in M2MTaskInTestingSession.objects.filter(session_id=self.id)}
+            tasks_in_session = {
+                task.id for task in M2MTaskInTestingSession.objects.filter(session_id=self.id, task__isnull=False)
+            }
             solutions = Solution.objects.select_derivatives().filter(task_in_testing_session__session=self)
             count_correct_tasks = len(tasks_in_session)
             result: Optional[float] = None
@@ -99,6 +101,7 @@ class TestingSession(models.Model):
                         result = task_result
                     else:
                         result += task_result
+            if solution.task_in_testing_session.id in tasks_in_session:
                 tasks_in_session.remove(solution.task_in_testing_session.id)
             if tasks_in_session and not force_recalculate:
                 raise RuntimeError("TestingSession have unresolved tasks")
@@ -376,6 +379,9 @@ class MultipleChoiceTestSolution(Solution):
 
     def _calculate_result(self, force_recalculate: bool = False) -> Optional[float]:
         if force_recalculate or self.result is None:
+            if self.task_in_testing_session.task is None:
+                return None
+            
             selected_options_weight = 0
             for option in self.selected_answer_set.all():
                 if option.selected_answer is None:

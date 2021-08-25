@@ -88,7 +88,7 @@ class TestingView(FormView):
         if self.kwargs["session"].end < timezone.now():
             return HttpResponseRedirect(reverse('testing result', kwargs={'pk': self.kwargs["pk"]}))
         self.kwargs["task_in_session"] = M2MTaskInTestingSession.objects.filter(
-            session_id=self.kwargs["session"].id, is_completed=False
+            session_id=self.kwargs["session"].id, is_completed=False, task__isnull=False
         ).first()
         if self.kwargs["task_in_session"] is None:
             return HttpResponseRedirect(reverse('testing result', kwargs={'pk': self.kwargs["pk"]}))
@@ -111,7 +111,9 @@ class TestingView(FormView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["session"] = self.kwargs["session"]
-        context["number_of_task_left"] = context["session"].task_set.filter(is_completed=False).count()
+        context["number_of_task_left"] = context["session"].task_set.filter(
+            is_completed=False, task__isnull=False
+        ).count()
         if context["session"].test.is_allow_help:
             context["help"] = self.kwargs["task"].help_text
         return context
