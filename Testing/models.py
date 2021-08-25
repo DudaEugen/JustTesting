@@ -101,8 +101,8 @@ class TestingSession(models.Model):
                         result = task_result
                     else:
                         result += task_result
-            if solution.task_in_testing_session.id in tasks_in_session:
-                tasks_in_session.remove(solution.task_in_testing_session.id)
+                if solution.task_in_testing_session.id in tasks_in_session:
+                    tasks_in_session.remove(solution.task_in_testing_session.id)
             if tasks_in_session and not force_recalculate:
                 raise RuntimeError("TestingSession have unresolved tasks")
             if count_correct_tasks == 0:
