@@ -7,6 +7,7 @@ class TaskInTestingSessionInline(admin.TabularInline):
 
     model = TestingSession.tasks.through
     readonly_fields = (
+        "issue_datetime",
         "task",
         "is_completed",
         "order",
