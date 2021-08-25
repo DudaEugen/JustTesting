@@ -34,12 +34,13 @@
                 <tr>
                     <td>
                         {% if session.user %}
-                            {{ session.user.display_name }}
+                            {{ session.user.username }}
                             <span class="user__checkmark" title="Користувач авторизувався">&#10003;</span>
                         {% else %}
-                            {{ session.names }}
+                            {{ session.display_name }}
                         {% endif %}
                     </td>
+                    <td>{{ session.group }}</td>
                     <td>{{ session.begin|date:"d.m.y H:i" }}</td>
                     <td>{{ session.end|date:"d.m.y H:i" }}</td>
                     <td>{{ session.result|floatformat }}%</td>
