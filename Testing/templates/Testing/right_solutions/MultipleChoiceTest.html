@@ -1,0 +1,23 @@
+{% extends 'Testing/right_solutions/solution.html' %}
+
+{% block solution_static_load %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'Testing/css/multiple_choice_test_solution.css' %}">
+{% endblock %}
+
+{% block solution %}
+    {% if task is None %}
+        <p>Нажаль, не вдалось відобразити вірну відповідь.</p>
+    {% else %}
+        <div class="header">
+            Вірні відповіді мають зелений фон. Обрані Вами відповіді мають помаранчеву границю
+        </div>
+        <div>{{ task.text }}</div>
+        {% for answer in task.answer_set.all %}
+            <div class="answer {% if answer.weight != 0  %}right{%endif%} 
+                        {% if answer in solution.selected_answers.all %}choiced{% endif %}">
+                {{ answer }} 
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

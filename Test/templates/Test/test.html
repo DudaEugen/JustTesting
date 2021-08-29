@@ -64,6 +64,17 @@
 
                 <p>
                     <!-- input is_allow_skip_task -->
+                    {% with input=form.show_right_solution_after_mistake %}
+                    {% with label=form.show_right_solution_after_mistake.label %}
+                    {% with small_text=form.show_right_solution_after_mistake.help_text %}
+                        {% include "JustTesting/forms/fields/input.html" %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                </p>
+
+                <p>
+                    <!-- input is_allow_skip_task -->
                     {% with input=form.is_allow_skip_task %}
                     {% with label=form.is_allow_skip_task.label %}
                     {% with small_text=form.is_allow_skip_task.help_text %}

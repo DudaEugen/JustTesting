@@ -77,6 +77,7 @@ class MultipleChoiceTestSolutionForm(forms.Form):
         for answer in self.cleaned_data['selected_answers']:
             solution.selected_answers.add(MultipleChoiceTestAnswer.objects.get(id=answer))
         solution.compute_and_save_result_if_not_exist()
+        return solution
 
 
 class ResultsDispatcherForm(forms.Form):

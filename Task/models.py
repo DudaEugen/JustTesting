@@ -152,6 +152,9 @@ class MultipleChoiceTest(Task):
             raise ValidationError(errors)
 
 
+    
+
+
 class MultipleChoiceTestAnswer(models.Model):
     """
     Answer option to task with multiple choice.

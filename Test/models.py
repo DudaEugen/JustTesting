@@ -53,6 +53,11 @@ class Test(models.Model):
         verbose_name="Підказка",
         help_text="Чи дозволено використовувати підказки?",
     )
+    show_right_solution_after_mistake = models.BooleanField(
+        default=False,
+        verbose_name="Вірна відповідь",
+        help_text="Показувати вірну відповідь після помилки?",
+    )
     is_allow_skip_task = models.BooleanField(
         default=False,
         verbose_name="Пропуск завдання",

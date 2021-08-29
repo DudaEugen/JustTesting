@@ -1,0 +1,24 @@
+.header {
+    text-align: center;
+    font-size: large;
+    font-weight: 600;
+    padding-bottom: 15px;
+}
+
+.answer {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 15px;
+    background-color: bisque;
+}
+
+.right {
+    background-color: green;
+}
+
+.choiced {
+    border: solid 3px orange;
+}

@@ -1,0 +1,18 @@
+{% extends 'JustTesting/base.html' %}
+
+{% block title %}
+    Вірна відповідь
+{% endblock %}
+
+{% block static_load %}
+    {% block solution_static_load %}
+    {% endblock %}
+{% endblock %}
+
+{% block content %}
+    <div>
+        {% block solution %}
+        {% endblock %}
+    </div>
+    <a href="{% url 'testing' pk=session_pk %}" class="btn btn-success">Продовжити</a>
+{% endblock %}

@@ -8,8 +8,6 @@ from .models import *
 from .forms import TestingSessionOfAutorizedUserForm, TestingSessionOfUnautorizedUserForm,\
                    ResultsDispatcherForm
 from django.utils import timezone
-from django.utils.decorators import method_decorator
-from JustTesting.utils.permission_decorators import user_permissions_decorator
 from typing import Dict, Any, Tuple
 
 
@@ -119,7 +117,7 @@ class TestingView(FormView):
         return context
 
     def form_valid(self, form):
-        form.save()
+        self.kwargs["solution"] = form.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def get_form_class(self):
@@ -135,7 +133,13 @@ class TestingView(FormView):
         return [self.kwargs["form_class"].template_name]
 
     def get_success_url(self) -> str:
-        return f"session={self.kwargs['pk']}"
+        if self.kwargs["session"].test.show_right_solution_after_mistake and\
+           self.kwargs["solution"].result != 100:
+            return reverse("right solution", kwargs={
+                "session_pk": self.kwargs["session"].id,
+                "solution_pk":  self.kwargs["solution"].id,
+            })
+        return reverse("testing", kwargs={"pk": self.kwargs['pk']})
 
 
 class CloseTestingSessionView(RedirectView):
@@ -148,6 +152,50 @@ class CloseTestingSessionView(RedirectView):
         )
         self.url = 'result'    
         return super().get_redirect_url(*args, **kwargs)
+
+
+class RightSolutionView(DetailView):
+    templates_dir_name = "right_solutions"
+    context_object_name = "solution"
+
+    def get_session(self):
+        try:
+            session = TestingSession.objects.select_derivatives().get(pk=self.kwargs["session_pk"])
+        except TestingSession.DoesNotExist:
+            raise Http404("Incorrect session pk")
+
+        if not session.is_correct_user(self.request):
+            raise Http404("Incorrect session pk")
+        return session
+    
+    def get_task(self):
+        from Task.models import Task
+
+        return Task.objects.select_derivatives().filter(
+            id=self.kwargs["solution"].task_in_testing_session.task.id
+        ).first()
+
+    def get_object(self, queryset=None):
+        session = self.get_session()
+        try:
+            self.kwargs["solution"] = Solution.objects.select_derivatives().get(
+                pk=self.kwargs["solution_pk"], task_in_testing_session__session=session
+            )
+        except Solution.DoesNotExist:
+            raise Http404("Incorrect solution pk")        
+        return self.kwargs["solution"]
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["session_pk"] = self.kwargs["session_pk"]
+        context["task"] = self.get_task()
+        return context
+
+    def get_template_names(self):
+        return [
+            f"Testing/{RightSolutionView.templates_dir_name}/"
+            f"{self.kwargs['solution'].task_model.__name__}.html"
+        ]
 
 
 class SkipTaskView(RedirectView):
