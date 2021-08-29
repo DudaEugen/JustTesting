@@ -58,6 +58,11 @@ class Test(models.Model):
         verbose_name="Вірна відповідь",
         help_text="Показувати вірну відповідь після помилки?",
     )
+    repeat_unresolved_tasks = models.BooleanField(
+        default=False,
+        verbose_name="Повернути помилку",
+        help_text="Задавати в кінці тестування завдання, в яких були допущені помилки?",
+    )
     is_allow_skip_task = models.BooleanField(
         default=False,
         verbose_name="Пропуск завдання",

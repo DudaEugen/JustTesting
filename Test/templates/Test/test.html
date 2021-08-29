@@ -30,7 +30,6 @@
                 {% endwith %}
                          
                 <p>
-                    <!-- input is_allowed -->
                     {% with input=form.is_allowed %}
                     {% with label=form.is_allowed.label %}
                     {% with small_text=form.is_allowed.help_text %}
@@ -41,7 +40,6 @@
                 </p>
 
                 <p>
-                    <!-- input is_allow_for_unautorized_users -->
                     {% with input=form.is_allow_for_unautorized_users %}
                     {% with label=form.is_allow_for_unautorized_users.label %}
                     {% with small_text=form.is_allow_for_unautorized_users.help_text %}
@@ -52,7 +50,6 @@
                 </p>
 
                 <p>
-                    <!-- input is_allow_help -->
                     {% with input=form.is_allow_help %}
                     {% with label=form.is_allow_help.label %}
                     {% with small_text=form.is_allow_help.help_text %}
@@ -63,7 +60,6 @@
                 </p>
 
                 <p>
-                    <!-- input is_allow_skip_task -->
                     {% with input=form.show_right_solution_after_mistake %}
                     {% with label=form.show_right_solution_after_mistake.label %}
                     {% with small_text=form.show_right_solution_after_mistake.help_text %}
@@ -74,7 +70,16 @@
                 </p>
 
                 <p>
-                    <!-- input is_allow_skip_task -->
+                    {% with input=form.repeat_unresolved_tasks %}
+                    {% with label=form.repeat_unresolved_tasks.label %}
+                    {% with small_text=form.repeat_unresolved_tasks.help_text %}
+                        {% include "JustTesting/forms/fields/input.html" %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                </p>
+
+                <p>
                     {% with input=form.is_allow_skip_task %}
                     {% with label=form.is_allow_skip_task.label %}
                     {% with small_text=form.is_allow_skip_task.help_text %}

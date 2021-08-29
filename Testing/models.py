@@ -195,6 +195,8 @@ class M2MTaskInTestingSession(models.Model):
         Make the order largest in this test_session
         """
         self.order = self.session.task_set.last().order + 1
+        self.is_completed = False
+        self.issue_datetime = None
 
 
 class TestingSessionOfUnautorizedUser(TestingSession):

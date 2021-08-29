@@ -71,6 +71,9 @@ class MultipleChoiceTestSolutionForm(forms.Form):
         random.shuffle(self.fields["selected_answers"].choices)
 
     def save(self):
+        if hasattr(self.task_in_testing_session, "solution"):
+            self.task_in_testing_session.solution.delete()
+        
         solution = models.MultipleChoiceTestSolution()
         solution.task_in_testing_session = self.task_in_testing_session
         solution.save()

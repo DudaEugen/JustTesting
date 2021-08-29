@@ -118,6 +118,9 @@ class TestingView(FormView):
 
     def form_valid(self, form):
         self.kwargs["solution"] = form.save()
+        if self.kwargs["session"].test.repeat_unresolved_tasks and self.kwargs["solution"].result != 100:
+            self.kwargs["solution"].task_in_testing_session.replace_to_end()
+            self.kwargs["solution"].task_in_testing_session.save()
         return HttpResponseRedirect(self.get_success_url())
 
     def get_form_class(self):
