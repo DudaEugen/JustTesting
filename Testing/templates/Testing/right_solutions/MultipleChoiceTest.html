@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block solution %}
-    {% if task is None %}
-        <p>Нажаль, не вдалось відобразити вірну відповідь.</p>
+    {% if solution is None or task is None %}
+        {{ block.super }}
     {% else %}
         <div class="header">
             Вірні відповіді мають зелений фон. Обрані Вами відповіді мають помаранчеву границю

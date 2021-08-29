@@ -12,6 +12,11 @@
 {% block content %}
     <div>
         {% block solution %}
+            {% if solution is None %}
+                <p>Ви не можете переглянути відповідь на це питання.</p>
+            {% elif task is None %}
+                <p>Нажаль, не вдалось відобразити вірну відповідь.</p>
+            {% endif %}
         {% endblock %}
     </div>
     <a href="{% url 'testing' pk=session_pk %}" class="btn btn-success">Продовжити</a>

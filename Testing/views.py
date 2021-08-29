@@ -185,19 +185,22 @@ class RightSolutionView(DetailView):
                 pk=self.kwargs["solution_pk"], task_in_testing_session__session=session
             )
         except Solution.DoesNotExist:
-            raise Http404("Incorrect solution pk")        
+            raise Http404("Incorrect solution pk") 
+        self.kwargs["template_name"] = self.kwargs['solution'].task_model.__name__
+        if self.kwargs["solution"].datetime < timezone.now() - timezone.timedelta(minutes=1):
+            self.kwargs["solution"] = None
         return self.kwargs["solution"]
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["session_pk"] = self.kwargs["session_pk"]
-        context["task"] = self.get_task()
+        if self.kwargs["solution"] is not None:
+            context["task"] = self.get_task()
         return context
 
     def get_template_names(self):
         return [
-            f"Testing/{RightSolutionView.templates_dir_name}/"
-            f"{self.kwargs['solution'].task_model.__name__}.html"
+            f"Testing/{RightSolutionView.templates_dir_name}/{self.kwargs['template_name']}.html"
         ]
 
 
